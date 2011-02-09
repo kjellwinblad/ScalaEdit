@@ -8,7 +8,7 @@ class MainWindow extends MainFrame {
 
   title = "ScalaEdit"
 
-  iconImage = new ImageIcon(this.getClass.getResource("/scala-logo.png")).getImage()
+  iconImage = new ImageIcon(this.getClass.getResource("/images/img3.png")).getImage()
 
   
   val consolesPanel = new ConsolesPanel()

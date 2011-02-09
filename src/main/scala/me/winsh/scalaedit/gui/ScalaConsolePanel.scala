@@ -2,6 +2,8 @@ package me.winsh.scalaedit.gui
 
 import scala.swing._
 import javax.swing.SwingUtilities
+import javax.swing.event.CaretListener
+import javax.swing.event.CaretEvent
 import java.awt.event._
 import java.io.PrintWriter
 import java.io.OutputStream
@@ -29,6 +31,7 @@ class ScalaConsolePanel extends ConsolePanel {
   val consoleType = ScalaConsole
 
   private var inputPos = 0
+
   private var lastLine = new StringBuffer("")
 
   private val advancedPane = new EditorPaneWrapper()
@@ -42,6 +45,10 @@ class ScalaConsolePanel extends ConsolePanel {
   editorPane.setContentType("text/scala")
 
   editorPane.setEditable(false)
+  
+  editorPane.setComponentPopupMenu((new PopupMenu(){
+	  add(new MenuItem())	  
+  }).peer)
 
   editorPane.getCaret.setVisible(true)
 
@@ -79,7 +86,7 @@ class ScalaConsolePanel extends ConsolePanel {
           modifyCaretPos(e)
         }
         case VK_UP => modifyCaretPos(e)
-        case VK_DOWN if (historyPos < historyBuffer.size -1) => {
+        case VK_DOWN if (historyPos < historyBuffer.size - 1) => {
           historyPos = historyPos + 1
           modifyHistoryPos()
           modifyCaretPos(e)
@@ -94,6 +101,14 @@ class ScalaConsolePanel extends ConsolePanel {
         case VK_RIGHT => {
           if (inputPos != 0)
             inputPos = inputPos - 1
+          modifyCaretPos(e)
+        }
+        case VK_HOME => {
+          inputPos = lastLine.length
+          modifyCaretPos(e)
+        }
+        case VK_END => {
+          inputPos = 0
           modifyCaretPos(e)
         }
         case _ => {
@@ -154,6 +169,34 @@ class ScalaConsolePanel extends ConsolePanel {
         }
       }
 
+    }
+
+  })
+
+  editorPane.addMouseListener(new MouseAdapter() {
+
+    def modifyCaretPos() {
+      editorPane.setCaretPosition(editorPane.getText.length - inputPos)
+      editorPane.getCaret.setVisible(true)
+    }
+
+    override def mouseClicked(e: MouseEvent) {
+      println("Clciked")
+
+    }
+
+    override def mousePressed(e: MouseEvent) {
+
+      editorPane.getCaret.setVisible(false)
+
+    }
+    override def mouseReleased(e: MouseEvent) {
+
+      if (editorPane.getCaret.getMark == editorPane.getCaret.getDot)
+        modifyCaretPos()
+      else {
+        editorPane.getCaret.setVisible(false)
+      }
     }
 
   })
