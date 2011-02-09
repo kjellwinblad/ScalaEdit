@@ -4,11 +4,17 @@ import me.winsh.scalaedit.api._
 import scala.swing._
 import javax.swing.JSplitPane._
 import javax.swing.ImageIcon
+import java.io.File
+import javax.swing.Box
+import javax.swing.JOptionPane
+
 class MainWindow extends MainFrame {
 
-  title = "ScalaEdit"
+  val version = "0.1 Alpha"	
+	
+  title = "ScalaEdit (" + version + ")" 
 
-  iconImage = new ImageIcon(this.getClass.getResource("/images/img3.png")).getImage()
+  iconImage = Utils.getImage("/images/img3.png")
 
   
   val consolesPanel = new ConsolesPanel()
@@ -27,8 +33,12 @@ class MainWindow extends MainFrame {
         editorsPanel.addFileEditor(new FileBuffer(None))
       })
 
-      contents += new MenuItem(Action("Open") {
-        // open file dialog
+      contents += new MenuItem(Action("Open...") {
+        new FileChooser (new File(".")){
+        	title = "Open File(s)"
+        	multiSelectionEnabled=true
+        	fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+        }.showOpenDialog (this)
       })
 
       contents += new Separator()
@@ -38,22 +48,71 @@ class MainWindow extends MainFrame {
       })
     }
 
+     val terminalMenu = new Menu("Terminal") {
+
+      contents += new MenuItem(Action("New Scala Terminal") {
+        consolesPanel.addScalaTerminal()
+      })
+
+    }
+
+    val helpMenu = new Menu("Help") {
+
+      contents += new MenuItem(Action("About") {
+    	
+val text =
+<html>
+<h1>ScalaEdit</h1>
+<p>
+<table>
+<tr><td><i>Version:</i></td><td> {version}</td></tr>
+<tr><td><i>Homepage:</i></td><td> http://scala-edit.googlecode.com</td></tr>
+<tr><td><i>Source code:</i></td><td> http://github.com/kjellwinblad/ScalaEdit</td></tr>
+<tr><td><i>Contact:</i></td><td> kjellwinblad@gmail.com</td></tr>
+</table>
+</p>
+</html>.toString.split("\n").foldLeft("")((a,b)=>a+b)
+    	  
+    		val options = Array[Object]( "OK" );
+        JOptionPane.showOptionDialog(null, text, "About",
+                                          JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                                          Utils.getIcon("/images/img3.png"), options, options(0)
+        )
+    		
+        //JOptionPane.showMessageDialog(parentComponent = null, message = text, title="About", messageType=JOptionPane.PLAIN_MESSAGE, icon=Utils.getImage("/images/img3.png"),null,null)
+      })
+
+    }
+     
     contents += fileMenu
+    
+    contents += terminalMenu
+
+    contents += Swing.HGlue
+    
+    contents += helpMenu
+    
 
   }
 
-  contents = new SplitPane() {
+  private val mainSplitPane = new SplitPane() {
     orientation = Orientation.Horizontal
 
-    leftComponent = new SplitPane() {
+    val editorProjectSplitPane = new SplitPane() {
       orientation = Orientation.Vertical
       leftComponent = projectsPanel
       rightComponent = editorsPanel
     }
+    
+    editorProjectSplitPane.oneTouchExpandable = true
+    
+    leftComponent = editorProjectSplitPane
     rightComponent = consolesPanel
 
   }
+  mainSplitPane.oneTouchExpandable = true
   
+  contents = mainSplitPane
   pack()
   
 }

@@ -12,4 +12,6 @@ abstract class ConsolePanel extends BorderPanel {
 
   val consoleType: ConsoleType
 
+  
+  def close()
 }

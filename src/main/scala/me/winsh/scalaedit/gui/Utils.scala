@@ -9,12 +9,12 @@ object Utils {
   def clipboardContents_=(contentToSet: String) {
     val stringSelection = new StringSelection(contentToSet);
     val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    clipboard.setContents(stringSelection, new ClipboardOwner(){
-    	def lostOwnership(clipboard:Clipboard, contents:Transferable){/*Nothing needs to be done*/}
+    clipboard.setContents(stringSelection, new ClipboardOwner() {
+      def lostOwnership(clipboard: Clipboard, contents: Transferable) { /*Nothing needs to be done*/ }
     });
   }
 
-  def clipboardContents {
+  def clipboardContents = {
     var result = "";
     val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
 
@@ -36,6 +36,34 @@ object Utils {
 
     }
     result
+  }
+
+  def getImage(classPathPath: String) = getIcon(classPathPath).getImage()
+
+  def getIcon(classPathPath: String) = new ImageIcon(this.getClass.getResource(classPathPath))
+
+  def swingInvokeLater(fun: () => Unit) {
+    SwingUtilities.invokeLater(new Runnable {
+      def run {
+        fun()
+      }
+    })
+  }
+
+  def swingInvokeAndWait(fun: () => Unit) {
+    SwingUtilities.invokeAndWait(new Runnable {
+      def run {
+        fun()
+      }
+    })
+  }
+
+  def runInNewThread(fun: () => Unit) {
+    new Thread(new Runnable() {
+      def run {
+        fun()
+      }
+    }).start()
   }
 
 }

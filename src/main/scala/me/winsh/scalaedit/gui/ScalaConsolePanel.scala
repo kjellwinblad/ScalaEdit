@@ -1,6 +1,7 @@
 package me.winsh.scalaedit.gui
 
 import scala.swing._
+import javax.swing.JOptionPane
 import javax.swing.SwingUtilities
 import javax.swing.event.CaretListener
 import javax.swing.event.CaretEvent
@@ -13,12 +14,30 @@ import java.io.PipedReader
 import java.io.PipedWriter
 import java.io.BufferedWriter
 import scala.tools.nsc.Interpreter
+import scala.io.Source
 import scala.tools.nsc.InterpreterLoop
 import scala.tools.nsc.InterpreterResults
 import scala.tools.nsc.Settings
 import scala.collection.mutable.ArrayBuffer
+import org.apache.tools.ant.util.ReaderInputStream
 
 class ScalaConsolePanel extends ConsolePanel {
+
+  val terminalStdOut = new OutputStream {
+
+    def write(b: Int) {
+
+      Utils.swingInvokeLater(() => {
+        val textTmp = editorPane.getText
+
+        val text = if (textTmp == null) "" else textTmp
+
+        editorPane.setText(text + b.toChar)
+      })
+
+    }
+
+  }
 
   val historyBuffer = ArrayBuffer("")
 
@@ -45,14 +64,67 @@ class ScalaConsolePanel extends ConsolePanel {
   editorPane.setContentType("text/scala")
 
   editorPane.setEditable(false)
-  
-  editorPane.setComponentPopupMenu((new PopupMenu(){
-	  add(new MenuItem())	  
+
+  editorPane.setComponentPopupMenu((new PopupMenu() {
+    add(new MenuItem(new Action("Copy") {
+
+      icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+
+      def apply() {
+        val text = editorPane.getSelectedText()
+        if (text != null)
+          Utils.clipboardContents = text
+      }
+    }))
+    add(new MenuItem(new Action("Paste") {
+
+      icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
+
+      def apply() = writeToConsole(Utils.clipboardContents)
+
+    }))
   }).peer)
 
   editorPane.getCaret.setVisible(true)
 
-  val interpreter = createInterpreter()
+  var interpreterLoop = createInterpreter()
+
+  def close(){
+	  val line = "\n\n\n:quit\n"
+	          consoleWriter.write(line , 0, line.length )
+        consoleWriter.flush()
+  }
+  
+  def writeToConsole(toWrite: String) {
+
+    val endsWithNewLine = toWrite.toString.length == 0 && toWrite.toString.endsWith("\n")
+
+    val components = Source.fromString(toWrite).getLines().toList
+
+    val finalRows = if (endsWithNewLine) components else components.reverse.tail.reverse
+
+    def insertLastInConsole(string: String) = Utils.swingInvokeLater(() => {
+      val text = editorPane.getText
+      editorPane.setText(text + string)
+    })
+
+    if (finalRows.size > 0) {
+      finalRows.foreach { (line) =>
+        insertLastInConsole(line + "\n")
+        consoleWriter.write(line + "\n", 0, line.length + 1)
+        consoleWriter.flush()
+        Thread.sleep(30)
+
+      }
+    }
+
+    if (!endsWithNewLine) {
+      lastLine = new StringBuffer(components.last)
+      inputPos = 0
+
+      insertLastInConsole(lastLine.toString)
+    }
+  }
 
   editorPane.addKeyListener(new KeyAdapter() {
 
@@ -128,17 +200,18 @@ class ScalaConsolePanel extends ConsolePanel {
 
       charToInsert match {
         case VK_ENTER => {
-          historyBuffer(historyBuffer.size - 1) = lastLine.toString
-          historyBuffer.append("")
-          historyPos = historyBuffer.size - 1
-
+          if (lastLine.length != 0) {
+            historyBuffer(historyBuffer.size - 1) = lastLine.toString
+            historyBuffer.append("")
+            historyPos = historyBuffer.size - 1
+          }
           lastLine.append(charToInsert)
           modifyTextInTextPane(prevLength)
           modifyCaretPos(e)
 
           if (lastLine.toString.trim == ":history") {
             val historyString = historyBuffer.foldLeft("")((sum, next) => sum + "\n" + next)
-            editorPane.setText(editorPane.getText + historyString + "\n\nscala> ")
+            editorPane.setText(editorPane.getText + historyString.tail + "\nscala> ")
           } else {
             consoleWriter.write(lastLine.toString, 0, lastLine.length)
             consoleWriter.flush()
@@ -180,11 +253,6 @@ class ScalaConsolePanel extends ConsolePanel {
       editorPane.getCaret.setVisible(true)
     }
 
-    override def mouseClicked(e: MouseEvent) {
-      println("Clciked")
-
-    }
-
     override def mousePressed(e: MouseEvent) {
 
       editorPane.getCaret.setVisible(false)
@@ -201,7 +269,7 @@ class ScalaConsolePanel extends ConsolePanel {
 
   })
 
-  private def createInterpreter(): Interpreter = {
+  private def createInterpreter(): InterpreterLoop = {
 
     def jarPathOfClass(className: String) = {
       val resource = className.split('.').mkString("/", "/", ".class")
@@ -223,27 +291,59 @@ class ScalaConsolePanel extends ConsolePanel {
 
     settings.bootclasspath.value = (origBootclasspath :: pathList).mkString(java.io.File.separator)
 
-    val interpreterLoop = new InterpreterLoop(new BufferedReader(new PipedReader(pipedConsoleWriter)), new PrintWriter(new OutputStream {
+    var interLoop: InterpreterLoop = null
 
-      def write(b: Int) {
-        SwingUtilities.invokeLater(new Runnable {
-          def run {
-            val text = editorPane.getText
+    Utils.runInNewThread(() => {
+
+      val reader = new BufferedReader(new PipedReader(pipedConsoleWriter))
+
+      interLoop = new InterpreterLoop(reader, new PrintWriter(new OutputStream {
+        var initTextCounter = 0
+        var initDone = false
+        var hasGotInputChar = false
+
+        def write(b: Int) {
+
+          Utils.swingInvokeLater(() => {
+            var text = editorPane.getText
+
+            text = if (text == null) "" else text
+
+            if (initDone == false && (text == "" || text.endsWith("\n"))) {
+
+              initTextCounter = initTextCounter + 1
+
+              if (initTextCounter <= 3)
+                text = text + "//"
+
+            }
+
             editorPane.setText(text + b.toChar)
+          })
+
+          if (("" + b.toChar) == ">")
+            hasGotInputChar = true
+
+          if (initDone == false && hasGotInputChar && ("" + b.toChar) == " ") {
+
+            //interpreterLoop.injectOne("in", new ReaderInputStream(reader))
+            interLoop.injectOne("out", terminalStdOut)
+            interLoop.interpreter.interpret("Console.setOut(out)")
+            interLoop.interpreter.interpret("Console.setErr(out)")
+            //interLoop.interpreter.interpret("Console.setIn(in)")
+            initDone = true
           }
-        })
-      }
 
-    }))
+        }
 
-    new Thread(new Runnable {
-      def run {
+      }))
+ 
+      interLoop.main(settings)
 
-        interpreterLoop.main(settings)
-      }
-    }).start()
+    })
 
-    interpreterLoop.interpreter
+    //Thread.sleep(10000)
+    interLoop
   }
 
 }

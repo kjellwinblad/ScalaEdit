@@ -15,6 +15,8 @@ import com.wittams.gritty.ResizePanelDelegate;
 
 class SystemConsole extends ConsolePanel {
 
+	def close(){}
+	
   private val in = new ByteArrayInputStream(new Array[Byte](10000))
   private val out = new ByteArrayOutputStream(10000)
 
