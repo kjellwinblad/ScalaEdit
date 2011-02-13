@@ -2,11 +2,20 @@ package me.winsh.scalaedit.gui
 
 import me.winsh.scalaedit.api.Closeable
 import scala.swing._
+import javax.swing.Icon
 import components.TabsComponent
 import components.ButtonTabComponent
 
   class ButtonTabComponentImpl(val pane:TabbedPane) extends ButtonTabComponent {
      
+	def this(pane:TabbedPane, icon:Icon)={
+		this(pane)
+		setIcon(icon)
+	}
+	
+	
+	def icon_=(icon:Icon) = setIcon(icon)
+	
 	override def name(comp: ButtonTabComponent) = {
 
       val i = pane.peer.indexOfTabComponent(comp)
@@ -17,7 +26,9 @@ import components.ButtonTabComponent
 
     override def close(comp: ButtonTabComponent) {
       val i = pane.peer.indexOfTabComponent(comp)
-      pane.pages(i).content.asInstanceOf[Closeable].close()
-      pane.pages.remove(i)
+      val closeOk = pane.pages(i).content.asInstanceOf[Closeable].close()
+      
+      if(closeOk)
+    	  pane.pages.remove(i)
     }
   }

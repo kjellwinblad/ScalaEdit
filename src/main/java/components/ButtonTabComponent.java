@@ -36,6 +36,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.*;
 
+
 /**
  * Component to be used as tabComponent;
  * Contains a JLabel to show the text and 
@@ -46,6 +47,8 @@ public class ButtonTabComponent extends JPanel{
     /**
 	 *  
 	 */
+	
+	private JLabel label;
 	
 	public String name(ButtonTabComponent comp){return null;};
 	public void close(ButtonTabComponent comp){};
@@ -60,7 +63,7 @@ public class ButtonTabComponent extends JPanel{
         setOpaque(false);
         
         //make JLabel read titles from JTabbedPane
-        JLabel label = new JLabel() {
+        label = new JLabel() {
             /**
 			 * 
 			 */
@@ -71,6 +74,8 @@ public class ButtonTabComponent extends JPanel{
             }
         };
         
+        
+        
         add(label);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -79,6 +84,15 @@ public class ButtonTabComponent extends JPanel{
         add(button);
         //add more space to the top of the component
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+    }
+    
+    public ButtonTabComponent(Icon icon) {
+    	super();
+    	label.setIcon(icon);
+    }
+    
+    public void setIcon(Icon icon){
+    	label.setIcon(icon);
     }
 
     private class TabButton extends JButton implements ActionListener {

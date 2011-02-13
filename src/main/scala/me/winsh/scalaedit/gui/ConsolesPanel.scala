@@ -11,7 +11,7 @@ class ConsolesPanel extends TabbedPane {
 
     pages += new TabbedPane.Page("Scala Terminal", new ScalaConsolePanel())
      
-    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this))
+    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this, Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")))
   }
 
   addScalaTerminal()

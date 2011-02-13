@@ -43,18 +43,26 @@ class MainWindow extends MainFrame {
         icon = Utils.getIcon("/images/small-icons/actions/fileopen.png")
 
         def apply() {
-          new FileChooser(new File(".")) {
+          val chooser = new FileChooser(new File(".")) {
             title = "Open File(s)"
             multiSelectionEnabled = true
             fileSelectionMode = FileChooser.SelectionMode.FilesOnly
-          }.showOpenDialog(null)
+          }
+          
+          chooser.showOpenDialog(null)
+          
+          chooser.selectedFiles.foreach(file =>{
+        	editorsPanel.addFileEditor(new FileBuffer(Some(file)))  
+          })
+          
+          
         }
 
       })
 
       contents += new Separator()
 
-      contents +=  new MenuItem(new Action("Exit") {
+      contents += new MenuItem(new Action("Exit") {
 
         icon = Utils.getIcon("/images/small-icons/actions/exit.png")
 
@@ -66,11 +74,15 @@ class MainWindow extends MainFrame {
     }
 
     val terminalMenu = new Menu("Terminal") {
+      contents += new MenuItem(new Action("New Scala Terminal") {
 
-      contents += new MenuItem(Action("New Scala Terminal") {
-        consolesPanel.addScalaTerminal()
+        icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
+
+        def apply() {
+          consolesPanel.addScalaTerminal()
+        }
+
       })
-
     }
 
     val helpMenu = new Menu("Help") {
