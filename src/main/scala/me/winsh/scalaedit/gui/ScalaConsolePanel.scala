@@ -89,12 +89,14 @@ class ScalaConsolePanel extends ConsolePanel {
 
   var interpreterLoop = createInterpreter()
 
-  def close(){
-	  val line = "\n\n\n:quit\n"
-	          consoleWriter.write(line , 0, line.length )
-        consoleWriter.flush()
+  def close() = {
+    val line = "\n\n\n:quit\n"
+    consoleWriter.write(line, 0, line.length)
+    consoleWriter.flush()
+
+    true
   }
-  
+
   def writeToConsole(toWrite: String) {
 
     val endsWithNewLine = toWrite.toString.length == 0 && toWrite.toString.endsWith("\n")
@@ -337,7 +339,7 @@ class ScalaConsolePanel extends ConsolePanel {
         }
 
       }))
- 
+
       interLoop.main(settings)
 
     })

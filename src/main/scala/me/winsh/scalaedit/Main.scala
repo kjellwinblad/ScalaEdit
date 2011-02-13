@@ -6,13 +6,13 @@ import scala.swing._
 /**
  * @author Kjell Winblad
  */
-object Main {
-  
+object Main extends SimpleSwingApplication {
 
-  def main(args : Array[String]) {
-	  val window = new MainWindow()
-	   window.size = new Dimension(500,500)
-	   window.visible=true
+  def top = {
+    val window = new MainWindow()
+    window.size = new Dimension(500, 500)
+    window.visible = true
+    window
   }
-
+  
 }

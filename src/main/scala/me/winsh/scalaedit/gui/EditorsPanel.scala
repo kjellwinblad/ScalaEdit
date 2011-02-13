@@ -7,7 +7,11 @@ class EditorsPanel extends TabbedPane {
 
 	def addFileEditor(buffer:FileBuffer) {
 		
-		pages += new TabbedPane.Page(buffer.name, new EditorPanel(buffer))
+    pages += new TabbedPane.Page(buffer.name, new EditorPanel(buffer))
+     
+    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this))
+  
+		
 	}
 	
 }
