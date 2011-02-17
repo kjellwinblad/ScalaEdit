@@ -4,11 +4,20 @@ import me.winsh.scalaedit.api._
 import scala.swing._
 import jsyntaxpane._
 import javax.swing._
-import org.fife.ui.rtextarea._;
-import org.fife.ui.rsyntaxtextarea._;
+import javax.swing.text._
+import javax.swing.event._
+import scala.swing.event._
+import org.fife.ui.rtextarea._
+import org.fife.ui.rsyntaxtextarea._
+import java.awt.event.KeyEvent
+import java.awt.event.InputEvent
+import java.awt.event.ActionListener
+import java.awt.event.ActionEvent
 
-class EditorPanel(val fileBuffer: FileBuffer) extends BorderPanel with Closeable {
+class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: Iconifyable) extends BorderPanel with Closeable {
 
+	tabComponent.icon = Utils.getIcon("/images/small-icons/mimetypes/txt.png")
+	
   val editorPane = new RSyntaxTextArea();
 
   editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType));
@@ -20,11 +29,34 @@ class EditorPanel(val fileBuffer: FileBuffer) extends BorderPanel with Closeable
   private class EditorWrapper(val scroller: RTextScrollPane) extends Component {
     override lazy val peer: JScrollPane = scroller
   }
-  add(new EditorWrapper(scrollPane), BorderPanel.Position.Center)
+  private val editorWrapper = new EditorWrapper(scrollPane)
+  add(editorWrapper, BorderPanel.Position.Center)
 
-  //editorPane.setContentType(fileBuffer.contentType)
   //load the content into the editor 
   editorPane.setText(fileBuffer.content)
+
+  //Listen for changes
+  editorPane.getDocument().addDocumentListener(new DocumentListener() {
+    def changedUpdate(e: DocumentEvent) {
+      tabComponent.icon = fileBuffer.file match {
+        case Some(_) => Utils.getIcon("/images/small-icons/actions/filesave.png")
+        case None => Utils.getIcon("/images/small-icons/actions/filesaveas.png")
+      }
+
+    }
+    def insertUpdate(e: DocumentEvent) { changedUpdate(e) }
+    def removeUpdate(e: DocumentEvent) { changedUpdate(e) }
+  });
+
+  //Listen for save action etc
+
+  val saveAction = new AbstractAction() {
+    def actionPerformed(actionEvent: ActionEvent) {
+      tabComponent.icon = Utils.getIcon("/images/small-icons/mimetypes/txt.png")
+    }
+  }
+
+  editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction)
 
   def close() = {
     false

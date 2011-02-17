@@ -94,7 +94,7 @@ public class ButtonTabComponent extends JPanel{
     public void setIcon(Icon icon){
     	label.setIcon(icon);
     }
-
+    
     private class TabButton extends JButton implements ActionListener {
         /**
 		 * 
