@@ -1,5 +1,6 @@
 package me.winsh.scalaedit.gui
 
+import me.winsh.scalaedit.api._
 import javax.swing._
 import java.awt._
 import java.awt.datatransfer._
@@ -7,8 +8,8 @@ import java.io.File
 
 object Utils {
 
-	def bestFileChooserDir = new File(".")
-	
+  def bestFileChooserDir = new File(".")
+
   def clipboardContents_=(contentToSet: String) {
     val stringSelection = new StringSelection(contentToSet);
     val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -68,8 +69,14 @@ object Utils {
       }
     }).start()
   }
+
+  def iconForFile(file:File) = 
+	  if(file.isDirectory)
+	 	  getIcon("/images/small-icons/mimetypes/folder.png")
+	  else
+	 	  iconFromContentType((new FileBuffer(Some(file))).contentType)
   
-       def iconFromContentType(contentType: String) = contentType.toLowerCase match {
+  def iconFromContentType(contentType: String) = contentType.toLowerCase match {
     case "text/c" => getIcon("/images/small-icons/mimetypes/source_c.png")
     case "text/cpp" => getIcon("/images/small-icons/mimetypes/source_cpp.png")
     case "text/c++" => getIcon("/images/small-icons/mimetypes/source_cpp.png")
