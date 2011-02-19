@@ -13,14 +13,32 @@ import java.awt.event.KeyEvent
 import java.awt.event.InputEvent
 import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
+import java.io.File
+import java.awt.event.FocusListener
+import java.awt.event.FocusEvent
 
-class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: Iconifyable) extends BorderPanel with Closeable {
+class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
-	tabComponent.icon = Utils.getIcon("/images/small-icons/mimetypes/txt.png")
-	
+  private var savedVar = true
+
+  def saved_=(isSaved: Boolean) {
+    savedVar = isSaved
+    if (isSaved)
+      changeToSavedIcon()
+    else
+      tabComponent.icon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
+  }
+
+  def saved = savedVar
+
+  fileBuffer.file match {
+    case None => saved = false
+    case Some(_) => saved = true
+  }
+
   val editorPane = new RSyntaxTextArea();
 
-  editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType));
+  editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
 
   editorPane.setTabSize(2)
 
@@ -37,13 +55,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: Iconifyable) ext
 
   //Listen for changes
   editorPane.getDocument().addDocumentListener(new DocumentListener() {
-    def changedUpdate(e: DocumentEvent) {
-      tabComponent.icon = fileBuffer.file match {
-        case Some(_) => Utils.getIcon("/images/small-icons/actions/filesave.png")
-        case None => Utils.getIcon("/images/small-icons/actions/filesaveas.png")
-      }
-
-    }
+    def changedUpdate(e: DocumentEvent) { saved = false }
     def insertUpdate(e: DocumentEvent) { changedUpdate(e) }
     def removeUpdate(e: DocumentEvent) { changedUpdate(e) }
   });
@@ -51,16 +63,87 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: Iconifyable) ext
   //Listen for save action etc
 
   val saveAction = new AbstractAction() {
-    def actionPerformed(actionEvent: ActionEvent) {
-      tabComponent.icon = Utils.getIcon("/images/small-icons/mimetypes/txt.png")
+    def actionPerformed(actionEvent: ActionEvent): Unit = {
+
+      fileBuffer.file match {
+        case Some(_) => {
+          fileBuffer.content = editorPane.getText
+          changeToSavedIcon()
+        }
+        case None => {
+          saveAsAction.actionPerformed(actionEvent)
+        }
+      }
     }
   }
 
+  val saveAsAction: AbstractAction = new AbstractAction() {
+    def actionPerformed(actionEvent: ActionEvent): Unit = {
+
+      val (dirSuggestion, fileSuggestion) = fileBuffer.file match {
+        case Some(f) => (f.getParentFile, f.getName)
+        case None => (Utils.bestFileChooserDir, "")
+      }
+
+      //Display file chooser
+      val chooser = new FileChooser(dirSuggestion) {
+        title = "Save File As"
+        multiSelectionEnabled = false
+        if (fileSuggestion != "")
+          selectedFile = new File(dirSuggestion, fileSuggestion)
+
+        fileSelectionMode = FileChooser.SelectionMode.FilesOnly
+      }
+
+      chooser.showSaveDialog(null)
+
+      val sFile = if (chooser.selectedFile == null) None else Some(chooser.selectedFile)
+
+      sFile.foreach(file => {
+        fileBuffer.file = Some(file)
+        tabComponent.name = file.getName
+        saveAction.actionPerformed(actionEvent)
+        editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
+      })
+
+    }
+  }
+
+  private def changeToSavedIcon() {
+    tabComponent.icon = Utils.iconFromContentType(fileBuffer.contentType)
+  }
+
+  editorPane.addFocusListener(new FocusListener() {
+    def focusGained(e: FocusEvent) {
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction)
+    }
+
+    def focusLost(e: FocusEvent) {
+      //editorPane.getKeymap().removeBindings()
+    }
+  })
+
   editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction)
 
-  def close() = {
-    false
-  }
+  def close() = if (!saved) {
+    val result = Dialog.showOptions(this,
+      message = ("\"" + fileBuffer.file.getOrElse("New File") + "\" has been modified. Save changes?"),
+      title = "Save Resource",
+      messageType = Dialog.Message.Question,
+      optionType = Dialog.Options.YesNoCancel,
+      entries = Seq("Yes", "No", "Cancel"),
+      initial = 0)
+
+    result match {
+      case Dialog.Result.Yes => {
+        saveAction.actionPerformed(null)
+        true
+      }
+      case Dialog.Result.No => true
+      case _ => false
+    }
+
+  } else true
 
   private def syntaxStyleFromContentType(contentType: String) = contentType.toLowerCase match {
     case "text/asm" => SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86

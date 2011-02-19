@@ -5,10 +5,12 @@ import me.winsh.scalaedit.api.FileBuffer
 
 class EditorsPanel extends TabbedPane {
 
+  tabLayoutPolicy = TabbedPane.Layout.Scroll
+
   def addFileEditor(buffer: FileBuffer) {
 
-	val tabComponent = new ButtonTabComponentImpl(this);
-	  
+    val tabComponent = new ButtonTabComponentImpl(this);
+
     pages += new TabbedPane.Page(buffer.name, new EditorPanel(buffer, tabComponent))
 
     peer.setTabComponentAt(pages.size - 1, tabComponent)

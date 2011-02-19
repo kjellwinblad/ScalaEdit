@@ -1,13 +1,13 @@
 package me.winsh.scalaedit.gui
 
 import me.winsh.scalaedit.api.Closeable
-import me.winsh.scalaedit.api.Iconifyable
 import scala.swing._
 import javax.swing.Icon
 import components.ButtonTabComponent
+import me.winsh.scalaedit.api.TabComponent
 
-  class ButtonTabComponentImpl(val pane:TabbedPane) extends ButtonTabComponent with Iconifyable{
-     
+  class ButtonTabComponentImpl(val pane:TabbedPane) extends ButtonTabComponent with TabComponent{
+       
 	def this(pane:TabbedPane, icon:Icon)={
 		this(pane)
 		setIcon(icon)
@@ -15,6 +15,17 @@ import components.ButtonTabComponent
 	 
 	
 	def icon_=(icon:Icon) = setIcon(icon)
+ 
+	def icon = getIcon() 
+
+	def name_=(newName:String) ={
+		setName(newName)
+		val i = pane.peer.indexOfTabComponent(this)
+		pane.peer.setTitleAt(i, newName)
+
+	}
+ 
+	def name = getName() 
 	
 	override def name(comp: ButtonTabComponent) = {
 

@@ -4,4 +4,6 @@ import scala.swing._
 
 class ProjectPanel extends BorderPanel {
 
+	
+	
 }

@@ -20,7 +20,7 @@ class MainWindow extends MainFrame {
 
   val editorsPanel = new EditorsPanel()
 
-  val projectsPanel = new EditorsPanel()
+  val projectPanel = new ProjectPanel()
 
   val fileBuffers: Array[FileBuffer] = Array[FileBuffer]()
 
@@ -43,7 +43,7 @@ class MainWindow extends MainFrame {
         icon = Utils.getIcon("/images/small-icons/actions/fileopen.png")
 
         def apply() {
-          val chooser = new FileChooser(new File(".")) {
+          val chooser = new FileChooser(Utils.bestFileChooserDir) {
             title = "Open File(s)"
             multiSelectionEnabled = true
             fileSelectionMode = FileChooser.SelectionMode.FilesOnly
@@ -127,7 +127,7 @@ class MainWindow extends MainFrame {
 
     val editorProjectSplitPane = new SplitPane() {
       orientation = Orientation.Vertical
-      leftComponent = projectsPanel
+      leftComponent = projectPanel
       rightComponent = editorsPanel
     }
 

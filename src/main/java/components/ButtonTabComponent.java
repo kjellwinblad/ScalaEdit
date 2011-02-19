@@ -94,6 +94,18 @@ public class ButtonTabComponent extends JPanel{
     public void setIcon(Icon icon){
     	label.setIcon(icon);
     }
+
+    public Icon getIcon(){
+    	return label.getIcon();
+    }
+    
+    public void setName(String string){
+    	label.setText(string);
+    }
+
+    public String getName(){
+    	return label.getText();
+    }
     
     private class TabButton extends JButton implements ActionListener {
         /**
@@ -144,6 +156,7 @@ public class ButtonTabComponent extends JPanel{
                 g2.setColor(Color.MAGENTA);
             }
             int delta = 6;
+            
             g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
             g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
             g2.dispose();

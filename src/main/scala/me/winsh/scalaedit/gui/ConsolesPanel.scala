@@ -5,7 +5,7 @@ import scala.swing._
 
 class ConsolesPanel extends TabbedPane {
 
-
+tabLayoutPolicy = TabbedPane.Layout.Scroll
 
   def addScalaTerminal() {
 

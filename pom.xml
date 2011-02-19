@@ -85,6 +85,14 @@
   <scope>system</scope>
   <systemPath>${basedir}/lib/jzlib-1.07.jar</systemPath>
 </dependency>
+
+<dependency>
+  <groupId>scala.swing.treewrapper</groupId>
+  <artifactId>treewrapper</artifactId>
+  <version>0.1</version>
+  <scope>system</scope>
+  <systemPath>${basedir}/lib/scalatreewrapper_github_commit_e4bc44cd6b19fda25d6f.jar</systemPath>
+</dependency>
   
     <dependency>
       <groupId>org.scala-lang</groupId>
