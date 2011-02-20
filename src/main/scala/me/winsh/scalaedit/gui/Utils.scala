@@ -74,7 +74,7 @@ object Utils {
 	  if(file.isDirectory)
 	 	  getIcon("/images/small-icons/mimetypes/folder.png")
 	  else
-	 	  iconFromContentType((new FileBuffer(Some(file))).contentType)
+	 	  iconFromContentType((FileBuffer(file)).contentType)
   
   def iconFromContentType(contentType: String) = contentType.toLowerCase match {
     case "text/c" => getIcon("/images/small-icons/mimetypes/source_c.png")

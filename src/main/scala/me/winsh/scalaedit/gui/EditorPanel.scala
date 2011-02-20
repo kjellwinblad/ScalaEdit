@@ -51,8 +51,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   add(editorWrapper, BorderPanel.Position.Center)
 
   //load the content into the editor 
-  editorPane.setText(fileBuffer.content)
-
+  try {
+    editorPane.setText(fileBuffer.content)
+  } catch {
+    case _ => {
+    	Dialog.showMessage(message="This may not be a text file.", title="Could Not Read File")
+    	editorPane.setEnabled(false)
+    }
+  }
   //Listen for changes
   editorPane.getDocument().addDocumentListener(new DocumentListener() {
     def changedUpdate(e: DocumentEvent) { saved = false }
@@ -67,8 +73,12 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
       fileBuffer.file match {
         case Some(_) => {
+        	try{
           fileBuffer.content = editorPane.getText
           changeToSavedIcon()
+        	}catch{
+        		case _ => Dialog.showMessage(message="The file might be write protected.", title="Could Not Save File")
+        	}
         }
         case None => {
           saveAsAction.actionPerformed(actionEvent)

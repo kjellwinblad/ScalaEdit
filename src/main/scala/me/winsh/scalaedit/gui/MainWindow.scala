@@ -20,7 +20,7 @@ class MainWindow extends MainFrame {
 
   val editorsPanel = new EditorsPanel()
 
-  val projectPanel = new ProjectPanel()
+  val projectsPanel = new ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
   val fileBuffers: Array[FileBuffer] = Array[FileBuffer]()
 
@@ -33,7 +33,7 @@ class MainWindow extends MainFrame {
         icon = Utils.getIcon("/images/small-icons/actions/filenew.png")
 
         def apply() {
-          editorsPanel.addFileEditor(new FileBuffer(None))
+          editorsPanel.addFileEditor(FileBuffer())
         }
 
       })
@@ -48,14 +48,13 @@ class MainWindow extends MainFrame {
             multiSelectionEnabled = true
             fileSelectionMode = FileChooser.SelectionMode.FilesOnly
           }
-          
+
           chooser.showOpenDialog(null)
-          
-          chooser.selectedFiles.foreach(file =>{
-        	editorsPanel.addFileEditor(new FileBuffer(Some(file)))  
+
+          chooser.selectedFiles.foreach(file => {
+            editorsPanel.addFileEditor(FileBuffer(file))
           })
-          
-          
+
         }
 
       })
@@ -68,6 +67,18 @@ class MainWindow extends MainFrame {
 
         def apply() {
           dispose()
+        }
+
+      })
+    }
+
+    val projectMenu = new Menu("Project") {
+      contents += new MenuItem(new Action("Change Project Root...") {
+
+        icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
+
+        def apply() {
+          projectsPanel.changeRootAction()
         }
 
       })
@@ -113,6 +124,8 @@ class MainWindow extends MainFrame {
     }
 
     contents += fileMenu
+    
+    contents += projectMenu
 
     contents += terminalMenu
 
@@ -127,7 +140,7 @@ class MainWindow extends MainFrame {
 
     val editorProjectSplitPane = new SplitPane() {
       orientation = Orientation.Vertical
-      leftComponent = projectPanel
+      leftComponent = projectsPanel
       rightComponent = editorsPanel
     }
 
