@@ -12,7 +12,7 @@ object Main extends SimpleSwingApplication {
     val window = new MainWindow()
     window.size = new Dimension(500, 500)
     window.visible = true
-    window
+    window  
   }
   
 }

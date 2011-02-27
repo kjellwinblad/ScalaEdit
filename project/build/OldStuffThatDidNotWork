@@ -1,0 +1,78 @@
+  var kaystoreAlias = ""
+  var keystorePassword = ""
+
+  lazy val uploadWebStartToGoogleCode =
+    task { args =>
+      if (args.length == 5) {
+        kaystoreAlias = args(3)
+        keystorePassword = args(4)
+        uploadWebStartToGoogleCodeConstructor(args(0), args(1), args(2))
+      } else
+        task { Some("Usage: uploadWebStartToGoogleCode googleCodeProjectID googleCodeUsername googleCodePassword kaystoreAlias keystorePassword") }
+    }
+
+  def uploadWebStartToGoogleCodeConstructor(googleCodeProjectID: String, googleCodeUsername: String, googleCodePassword: String) =
+    task {
+
+      import java.lang.Runtime
+      import java.io._
+      import scala.io.Source
+
+      val scalaSources: PathFinder = "src" ** "*.scala"
+
+      val jarFiles: PathFinder = "target" / ("scala_" + projectScalaVersion) / "webstart" ** "*.jar"
+
+      val jnlpFiles: PathFinder = "target" / ("scala_" + projectScalaVersion) / "webstart" ** "*.jnlp"
+
+      for (
+        f <- (jarFiles.get.filter((f) =>
+          if (f.asFile.getName.startsWith("scala-")) f.asFile.getName.endsWith("-2.8.1.jar") else true) ++
+          jnlpFiles.get).map(_.asFile)
+      ) {
+
+        val p = Runtime.getRuntime().exec(Array("python", "./src/helperscripts/googlecode_upload.py", "-s", "JNLPUpload", "-p", googleCodeProjectID, "-u", googleCodeUsername, "-w", googleCodePassword, f.getAbsolutePath))
+
+        val in = Source.fromInputStream(p.getInputStream)
+        val err = Source.fromInputStream(p.getErrorStream)
+
+        for (l <- in.getLines)
+          println(l)
+
+        for (l <- err.getLines)
+          println(l)
+
+      }
+      None
+    } dependsOn `package`
+
+  import SignJar._
+  /*override*/ def webstartSignConfiguration = Some(new SignConfiguration("scalaedit", storePassword("scalaedit43") :: Nil))
+ /* override*/ def webstartPack200 = false
+ /* override */def webstartGzip = false
+
+ /* override*/ def jnlpXML(libraries: Seq[WebstartJarResource]) =
+    <jnlp spec="1.0+" codebase="http://scala-edit.googlecode.com/files/" href={ mainJar.split("/").last.replace("jar", "jnlp") }>
+      <information>
+        <title>ScalaEdit</title>
+        <vendor>winsh.me</vendor>
+        <homepage href="http://scala-edit.googlecode.com/"/>
+        <description kind="one-line">ScalaEdit is a text editor. It has syntax highlighting support and a Scala interpreter console etc.</description>
+        <description kind="short">Text editor for Scala programmers</description>
+        <description kind="tooltip">Text editor for Scala programmers</description>
+        <icon href="http://scala-edit.googlecode.com/files/logo.jpeg" kind="default"/>
+        <shortcut online="false"><desktop/><menu submenu="ScalaEdit"/></shortcut>
+      </information>
+      <security>
+        <all-permissions/>
+      </security>
+      <resources>
+        <j2se version="1.6+"/>
+        <jar main="true" href={ mainJar.split("/").last }/>
+        {
+          val jarFiles: PathFinder = "lib" ** "*.jar"
+          for (j <- jarFiles.get) yield <jar main="false" href={ j.asFile.getName }/>
+        }
+      </resources>
+      <application-desc main-class={ mainClass.get }>
+      </application-desc>
+    </jnlp>

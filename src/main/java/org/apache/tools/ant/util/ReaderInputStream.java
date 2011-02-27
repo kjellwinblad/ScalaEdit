@@ -27,7 +27,7 @@ import java.io.Reader;
  */
 public class ReaderInputStream extends InputStream {
 
-    /** Source Reader */
+    /** Source Reader */ 
     private Reader in;
 
     private String encoding = System.getProperty("file.encoding");

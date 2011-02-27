@@ -36,7 +36,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.*;
 
-
+ 
 /**
  * Component to be used as tabComponent;
  * Contains a JLabel to show the text and 
@@ -45,7 +45,7 @@ import java.awt.event.*;
 
 public class ButtonTabComponent extends JPanel{
     /**
-	 *  
+	 *   
 	 */
 	
 	private JLabel label;

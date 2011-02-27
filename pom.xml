@@ -1,177 +1,299 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>me.winsh</groupId>
-  <artifactId>scalaedit</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>${project.artifactId}</name>
-  <description>A simple text editor for Scala</description>
-  <inceptionYear>2010</inceptionYear>
-  <licenses>
-    <license>
-      <name>Apache</name>
-      <url>http://....</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>me.winsh</groupId>
+	<artifactId>scalaedit</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>${project.artifactId}</name>
+	<description>A simple text editor for Scala</description>
+	<url>http://scala-edit.googlecode.com</url>
+	<inceptionYear>2011</inceptionYear>
+	<licenses>
+		<license>
+			<name>Apache</name>
+			<url>http://....</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-  <properties>
-    <maven.compiler.source>1.5</maven.compiler.source>
-    <maven.compiler.target>1.5</maven.compiler.target>
-    <encoding>UTF-8</encoding>
-    <scala.version>2.8.1</scala.version>
-  </properties>
+	<properties>
+		<maven.compiler.source>1.5</maven.compiler.source>
+		<maven.compiler.target>1.5</maven.compiler.target>
+		<encoding>UTF-8</encoding>
+		<scala.version>2.8.1</scala.version>
+	</properties>
 
+		<repositories> <repository> <id>scala-tools.org</id> <name>Scala-Tools
+		Maven2 Repository</name>
+		<url>http://scala-tools.org/repo-releases</url> </repository>
+		</repositories> 
 <!--
-  <repositories>
-    <repository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </repository>
-  </repositories>
+<repositories>
+  <repository>
+    <id>repo</id>
+    <url>file://${basedir}/repo</url>
+  </repository>
+</repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </pluginRepository>
-  </pluginRepositories>
+	
+
+		
+		
+		<pluginRepositories> <pluginRepository>
+		<id>scala-tools.org</id> <name>Scala-Tools Maven2 Repository</name>
+		<url>http://scala-tools.org/repo-releases</url> </pluginRepository>
+		</pluginRepositories>
+	-->
+	
+	<!--
+	<pluginRepositories>
+        <pluginRepository>
+            <id>onejar-maven-plugin.googlecode.com</id>
+            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+        </pluginRepository>
+    </pluginRepositories>
+-->
+	<dependencies>
+  <!-- 
+		<dependency>
+			<groupId>jsyntaxpane</groupId>
+			<artifactId>jsyntaxpane</artifactId>
+			<version>0.9.5-b29</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.wittams.gritty</groupId>
+			<artifactId>gritty</artifactId>
+			<version>0.02</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/gritty-0.02.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jcraft.jsch</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.32</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jsch-0.1.32.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jcraft.jzlib</groupId>
+			<artifactId>jzlib</artifactId>
+			<version>1.07</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jzlib-1.07.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>scala.swing</groupId>
+			<artifactId>treewrapper</artifactId>
+			<version>e4bc44cd6b19fda25d6f</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-swing</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-compiler</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
 -->
 
-<!--  <repositories>
-    <repository>
-        <id>local</id>
-        <name>Local Mvn Repository</name>
-        <layout>default</layout>
-        <url>file:./lib</url> 
-    </repository>
-</repositories>
-   <dependency>
-      <groupId>jsyntaxpane</groupId>
-      <artifactId>jsyntaxpane</artifactId>
-      <version>0.9.5-b29</version>
-    </dependency>-->
-  <dependencies>
-  
-  <dependency>
-  <groupId>jsyntaxpane</groupId>
-  <artifactId>jsyntaxpane</artifactId>
-  <version>0.9.5-b29</version>
-  <scope>system</scope>
-  <systemPath>${basedir}/lib/jsyntaxpane-0.9.5-b29.jar</systemPath>
-</dependency>
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-tools.testing</groupId>
+			<artifactId>specs_2.8.0</artifactId>
+			<version>1.6.5</version>
+			<scope>test</scope>
+		</dependency>
+		<!--<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fifesoft</groupId>
+			<artifactId>rsyntaxtextarea</artifactId>
+			<version>1.4.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>-->
+	</dependencies>
 
-<dependency>
-  <groupId>com.wittams.gritty</groupId>
-  <artifactId>gritty</artifactId>
-  <version>0.02</version>
-  <scope>system</scope>
-  <systemPath>${basedir}/lib/gritty-0.02.jar</systemPath>
-</dependency>
+	<organization>
+		<name>winsh</name>
+		<url>winsh.me</url>
+	</organization>
+	<build>
+		<sourceDirectory>src/main/scala</sourceDirectory>
+		<testSourceDirectory>src/test/scala</testSourceDirectory>
+		<plugins>
+		<!--  
+		            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>me.winsh.scalaedit.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.dstovall</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.4</version>
+                <executions>
+                    <execution>
+                        <configuration>
 
-<dependency>
-  <groupId>com.jcraft.jsch</groupId>
-  <artifactId>jsch</artifactId>
-  <version>0.1.32</version>
-  <scope>system</scope>
-  <systemPath>${basedir}/lib/jsch-0.1.32.jar</systemPath>
-</dependency>
+                            <onejarVersion>0.97</onejarVersion>
 
-<dependency>
-  <groupId>com.jcraft.jzlib</groupId>
-  <artifactId>jzlib</artifactId>
-  <version>1.07</version>
-  <scope>system</scope>
-  <systemPath>${basedir}/lib/jzlib-1.07.jar</systemPath>
-</dependency>
+                            <attachToBuild>true</attachToBuild>
 
-<dependency>
-  <groupId>scala.swing.treewrapper</groupId>
-  <artifactId>treewrapper</artifactId>
-  <version>0.1</version>
-  <scope>system</scope>
-  <systemPath>${basedir}/lib/scalatreewrapper_github_commit_e4bc44cd6b19fda25d6f.jar</systemPath>
-</dependency>
-  
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
-       <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-compiler</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
+                            <classifier>onejar</classifier>
+                        </configuration>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+		
+		
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.15.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<args>
+								<arg>-make:transitive</arg>
+								<arg>-dependencyfile</arg>
+								<arg>${project.build.directory}/.scala_dependencies</arg>
+							</args>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<useFile>false</useFile>
+					<disableXmlReport>true</disableXmlReport>
 
+					<includes>
+						<include>**/*Test.*</include>
+						<include>**/*Suite.*</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo.webstart</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+			</plugin>
+-->
+		</plugins>
 
-    <!-- Test -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-tools.testing</groupId>
-      <artifactId>specs_2.8.0</artifactId>
-      <version>1.6.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>log4j</groupId>
-    	<artifactId>log4j</artifactId>
-    	<version>1.2.14</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.fifesoft</groupId>
-    	<artifactId>rsyntaxtextarea</artifactId>
-    	<version>1.4.1</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <version>2.15.0</version>
-        <executions>
-          <execution>
+		<pluginManagement>
+			<plugins>
+<!-- 
+				<plugin>
+					<groupId>org.codehaus.mojo.webstart</groupId>
+					<artifactId>webstart-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <phase>process-resources</phase>
             <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
+                <goal>jnlp</goal>
             </goals>
-            <configuration>
-              <args>
-                <arg>-make:transitive</arg>
-                <arg>-dependencyfile</arg>
-                <arg>${project.build.directory}/.scala_dependencies</arg>
-              </args>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <useFile>false</useFile>
-          <disableXmlReport>true</disableXmlReport>
-          <!-- If you have classpath issue like NoDefClassError,... -->
-          <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
-          <includes>
-            <include>**/*Test.*</include>
-            <include>**/*Suite.*</include>
-          </includes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        </execution>
+    </executions>
+					<configuration>
+
+						<jnlp>
+							<mainClass>me.winsh.scalaedit.Main</mainClass>
+							<outputFile>scalaedit-${project.version}.jnlp</outputFile>
+						</jnlp> 
+						<outputDirectoryName>webstart</outputDirectoryName>
+						<excludeTransitive>false</excludeTransitive>
+						<jnlpFiles>
+							<jnlpFile>
+								<templateFilename>template.vm</templateFilename>
+								<outputFilename>scalaedit-${project.version}.jnlp</outputFilename>
+								<jarResources>
+									<jarResource>
+										<groupId>me.winsh</groupId>
+										<artifactId>scalaedit</artifactId>
+										<version>${project.version}</version>
+										<mainClass>me.winsh.scalaedit.Main</mainClass>
+									</jarResource>
+								</jarResources>
+							</jnlpFile>
+						</jnlpFiles>
+						
+						
+						<sign>
+							<keystore>/tmp/myappkeystore</keystore>
+							<keypass>m2m2m2</keypass>
+							<storepass>m2m2m2</storepass>
+							<alias>foobar</alias>
+							<validity>3650</validity>
+
+							<dnameCn>winsh.me</dnameCn>
+							<dnameOu>Software Development</dnameOu>
+							<dnameO>winsh.me</dnameO>
+							<dnameL>Winblad</dnameL>
+							<dnameSt>Kjell</dnameSt>
+							<dnameC>SE</dnameC>
+							<verify>false</verify>
+							<keystoreConfig>
+								<delete>true</delete>
+								<gen>true</gen>
+							</keystoreConfig>
+						</sign>
+						<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+						<outputJarVersions>true</outputJarVersions>
+						<verbose>true</verbose>
+						<unsign>true</unsign>
+						<verifyjar>false</verifyjar>
+					</configuration>
+				</plugin>
+
+
+ -->
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+
+
+
 </project>
