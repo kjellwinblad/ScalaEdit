@@ -45,10 +45,6 @@ class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Ecli
 
   def uploadToGooglecodeConstructor(googleCodeProjectID: String, googleCodeUsername: String, googleCodePassword: String) =
     task {
-
-	  cleanAction
-	  incrementVersionAction
-	  assembly
 	  
       import java.lang.Runtime
       import java.io._

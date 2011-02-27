@@ -1,8 +1,8 @@
 ScalaEdit
 =========
-OBS ScalaEdit is in an early development phase at the moment so unfortunately no usable version is available.
+ScalaEdit is a text editor especially designed for Scala programmers.
 
-The runnable binaries will be available at:
-http://googlecode.scala-edit.com
+ScalaEdit is in an early development phase at the moment. A simple version with syntax highlighting, a Scala console and a project browser is available as an executable jar-file.
 
-ScalaEdit is a text editor. It is especially designed for Scala programmers but is usable by anyone. It has a Scala interpreter Console with syntax highlighting built-in so it could be useful only for that reason.
+Executable binaries can be downloaded from the project web site: 
+http://scala-edit.google.com/
