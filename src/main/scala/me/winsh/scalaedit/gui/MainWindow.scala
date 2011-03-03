@@ -10,7 +10,7 @@ import javax.swing.JOptionPane
 
 class MainWindow extends MainFrame {
 
-  val version = "0.0.1"
+  val version = "0.0.2"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -145,12 +145,14 @@ class MainWindow extends MainFrame {
     }
 
     editorProjectSplitPane.oneTouchExpandable = true
-
+    
     leftComponent = editorProjectSplitPane
     rightComponent = consolesPanel
 
   }
   mainSplitPane.oneTouchExpandable = true
+  
+  mainSplitPane.dividerLocation = 0.8
 
   contents = mainSplitPane
   pack()

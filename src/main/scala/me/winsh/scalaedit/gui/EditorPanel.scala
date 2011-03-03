@@ -16,17 +16,22 @@ import java.awt.event.ActionEvent
 import java.io.File
 import java.awt.event.FocusListener
 import java.awt.event.FocusEvent
+import scala.swing.Action
 
 class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
   private var savedVar = true
+  private val saveAsIcon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
+  private val saveIcon = Utils.getIcon("/images/small-icons/actions/filesave.png")
 
   def saved_=(isSaved: Boolean) {
     savedVar = isSaved
-    if (isSaved)
+    saveAction.enabled = !isSaved
+    if (isSaved) {
       changeToSavedIcon()
-    else
-      tabComponent.icon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
+    } else {
+      tabComponent.icon = saveAsIcon
+    }
   }
 
   def saved = savedVar
@@ -36,7 +41,15 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     case Some(_) => saved = true
   }
 
-  val editorPane = new RSyntaxTextArea();
+  val editorPane = new RSyntaxTextArea() {
+    override protected def createPopupMenu() = (new PopupMenu() {
+      add(new MenuItem(cutAction))
+      add(new MenuItem(copyAction))
+      add(new MenuItem(pasteAction))
+      addSeparator()
+      add(new MenuItem(selectAllAction))
+    }).peer
+  };
 
   editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
 
@@ -48,15 +61,35 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     override lazy val peer: JScrollPane = scroller
   }
   private val editorWrapper = new EditorWrapper(scrollPane)
+
   add(editorWrapper, BorderPanel.Position.Center)
+
+  object toolBar extends JToolBar {
+    def add(a: Action) = super.add(a.peer)
+    def add(a: ToggleButton) = super.add(a.peer)
+
+    add(saveAction)
+    //add(saveAsAction)
+    add(new JToolBar.Separator)
+    add(undoAction)
+    add(redoAction)
+    //add(new JToolBar.Separator)
+    //add(cutAction)
+    //add(copyAction)
+    //add(pasteAction)
+    add(new JToolBar.Separator)
+    add(new ToggleButton() { action = wrapLinesAction })
+  }
+
+  add(Component.wrap(toolBar), BorderPanel.Position.North)
 
   //load the content into the editor 
   try {
     editorPane.setText(fileBuffer.content)
   } catch {
     case _ => {
-    	Dialog.showMessage(message="This may not be a text file.", title="Could Not Read File")
-    	editorPane.setEnabled(false)
+      Dialog.showMessage(message = "This may not be a text file.", title = "Could Not Read File")
+      editorPane.setEnabled(false)
     }
   }
   //Listen for changes
@@ -67,28 +100,33 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   });
 
   //Listen for save action etc
-
-  val saveAction = new AbstractAction() {
-    def actionPerformed(actionEvent: ActionEvent): Unit = {
-
+  object saveAction extends Action("Save") {
+    icon = saveIcon
+    toolTip = "Save (control+s)"
+    def apply() {
       fileBuffer.file match {
         case Some(_) => {
-        	try{
-          fileBuffer.content = editorPane.getText
-          changeToSavedIcon()
-        	}catch{
-        		case _ => Dialog.showMessage(message="The file might be write protected.", title="Could Not Save File")
-        	}
+          try {
+            fileBuffer.content = editorPane.getText
+            saved = true
+          } catch {
+            case _ => Dialog.showMessage(message = "The file might be write protected.", title = "Could Not Save File")
+          }
         }
         case None => {
-          saveAsAction.actionPerformed(actionEvent)
+          saveAsAction()
         }
       }
     }
   }
 
-  val saveAsAction: AbstractAction = new AbstractAction() {
-    def actionPerformed(actionEvent: ActionEvent): Unit = {
+  object saveAsAction extends Action("Save As...") {
+
+    toolTip = "Save As..."
+
+    icon = saveAsIcon
+
+    def apply() {
 
       val (dirSuggestion, fileSuggestion) = fileBuffer.file match {
         case Some(f) => (f.getParentFile, f.getName)
@@ -112,20 +150,103 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
       sFile.foreach(file => {
         fileBuffer.file = Some(file)
         tabComponent.name = file.getName
-        saveAction.actionPerformed(actionEvent)
+        saveAction()
         editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
       })
 
     }
   }
+  //REDO_ACTION, ROUNDED_SELECTION_PROPERTY, SELECT_ALL_ACTION, UNDO_ACTION
+
+  object undoAction extends Action("Undo") {
+
+    toolTip = "<html>Undo <i>(control+z)</i>"
+
+    icon = Utils.getIcon("/images/small-icons/undo.png")
+
+    def apply() {
+      editorPane.undoLastAction()
+    }
+  }
+
+  object redoAction extends Action("Redo") {
+
+    toolTip = "<html>Redo <i>(control+y)</i>"
+
+    icon = Utils.getIcon("/images/small-icons/redo.png")
+
+    def apply() {
+      editorPane.redoLastAction()
+    }
+  }
+
+  object cutAction extends Action("<html>Cut <i>(control+x)</i>") {
+
+    toolTip = name
+
+    icon = Utils.getIcon("/images/small-icons/cut-to-clipboard.png")
+
+    def apply() = editorPane.cut()
+
+  }
+
+  object copyAction extends Action("<html>Copy <i>(control+c)</i>") {
+
+    toolTip = name
+
+    icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+
+    def apply() = editorPane.copy()
+  }
+
+  object pasteAction extends Action("<html>Paste <i>(control+v)</i>") {
+
+    toolTip = name
+
+    icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
+
+    def apply() = editorPane.paste()
+
+  }
+
+  object selectAllAction extends Action("<html>Select All <i>(control+a)</i>") {
+
+    toolTip = name
+
+    icon = Utils.getIcon("/images/small-icons/select-all.png")
+
+    def apply() = editorPane.selectAll()
+
+  }
+
+  object wrapLinesAction extends Action("") {
+
+    toolTip = "Wrap Lines"
+
+    var wrapLines = false
+
+    icon = Utils.getIcon("/images/small-icons/wrap-lines.png")
+
+    def apply() {
+      wrapLines = !wrapLines
+      editorPane.setLineWrap(wrapLines)
+    }
+  }
+
+  // editorPane.setPopupMenu((new PopupMenu() {
+  //   add(new MenuItem(cutAction))
+  //   add(new MenuItem(copyAction))
+  //   add(new MenuItem(pasteAction))
+  // }).peer)
 
   private def changeToSavedIcon() {
+
     tabComponent.icon = Utils.iconFromContentType(fileBuffer.contentType)
   }
 
   editorPane.addFocusListener(new FocusListener() {
     def focusGained(e: FocusEvent) {
-      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer)
     }
 
     def focusLost(e: FocusEvent) {
@@ -133,7 +254,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     }
   })
 
-  editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction)
+  editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer)
 
   def close() = if (!saved) {
     val result = Dialog.showOptions(this,
@@ -146,7 +267,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     result match {
       case Dialog.Result.Yes => {
-        saveAction.actionPerformed(null)
+        saveAction()
         true
       }
       case Dialog.Result.No => true

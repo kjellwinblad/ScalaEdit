@@ -43,6 +43,7 @@ class EditorsPanel extends TabbedPane {
       peer.setTabComponentAt(pages.size - 1, tabComponent)
 
       peer.setSelectedComponent(newEditorPanel.peer)
+
       
     }
   }
