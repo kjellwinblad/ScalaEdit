@@ -6,7 +6,7 @@ import javax.swing.Icon
 import components.ButtonTabComponent
 import me.winsh.scalaedit.api.TabComponent
 
-  class ButtonTabComponentImpl(val pane:TabbedPane) extends ButtonTabComponent with TabComponent{
+  class ButtonTabComponentImpl(val pane:TabbedPane, val closeHandler:()=>Unit = (()=>{})) extends ButtonTabComponent with TabComponent{
        
 	def this(pane:TabbedPane, icon:Icon)={
 		this(pane)
@@ -39,7 +39,9 @@ import me.winsh.scalaedit.api.TabComponent
       val i = pane.peer.indexOfTabComponent(comp)
       val closeOk = pane.pages(i).content.asInstanceOf[Closeable].close()
       
-      if(closeOk)
+      if(closeOk){
     	  pane.pages.remove(i)
+    	  closeHandler()
+      }
     }
   }

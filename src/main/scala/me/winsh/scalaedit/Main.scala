@@ -1,10 +1,10 @@
 package me.winsh.scalaedit
-
+ 
 import me.winsh.scalaedit.gui.MainWindow
 import scala.swing._
 import java.awt.Toolkit
 import java.awt.Point
-/**
+/**  
  * @author Kjell Winblad
  */
 object Main extends SimpleSwingApplication {

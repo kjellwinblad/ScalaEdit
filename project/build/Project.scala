@@ -31,7 +31,7 @@ class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Ecli
           println(l)
 
         None
-      } dependsOn (compile)
+      } dependsOn (`package`)
     }
 
   lazy val uploadToGooglecode =

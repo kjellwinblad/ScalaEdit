@@ -7,10 +7,13 @@ import javax.swing.ImageIcon
 import java.io.File
 import javax.swing.Box
 import javax.swing.JOptionPane
+import me.winsh.scalaedit.gui.editor._
+import me.winsh.scalaedit.gui.project._
+import me.winsh.scalaedit.gui.console._
 
 class MainWindow extends MainFrame {
 
-  val version = "0.0.2"
+  val version = "0.0.3"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -18,7 +21,7 @@ class MainWindow extends MainFrame {
 
   val consolesPanel = new ConsolesPanel()
 
-  val editorsPanel = new EditorsPanel()
+  val editorsPanel = EditorsPanel()
 
   val projectsPanel = new ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
@@ -94,10 +97,20 @@ class MainWindow extends MainFrame {
         }
 
       })
+      
+      contents += new MenuItem(new Action("New SBT Terminal") {
+
+        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
+
+        def apply() {
+          consolesPanel.addSBTTerminal()
+        }
+
+      })
     }
 
     val helpMenu = new Menu("Help") {
-
+  
       contents += new MenuItem(Action("About") {
 
         val text =
@@ -118,7 +131,6 @@ class MainWindow extends MainFrame {
           JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
           Utils.getIcon("/images/img3.png"), options, options(0))
 
-        //JOptionPane.showMessageDialog(parentComponent = null, message = text, title="About", messageType=JOptionPane.PLAIN_MESSAGE, icon=Utils.getImage("/images/img3.png"),null,null)
       })
 
     }

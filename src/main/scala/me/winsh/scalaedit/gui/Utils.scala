@@ -2,9 +2,10 @@ package me.winsh.scalaedit.gui
 
 import me.winsh.scalaedit.api._
 import javax.swing._
-import java.awt._
+import java.awt.Toolkit
 import java.awt.datatransfer._
 import java.io.File
+import scala.swing._
 
 object Utils {
 
@@ -112,6 +113,15 @@ object Utils {
     case "text/bat" => getIcon("/images/small-icons/mimetypes/shell1.png")
     case "text/xml" => getIcon("/images/small-icons/mimetypes/resource.png")
     case _ => getIcon("/images/small-icons/mimetypes/txt.png")
+  }
+  
+  val propertiesDir = new File(new File(System.getProperty("user.home")), ".scalaedit")
+  
+  def showErrorMessage(parent:Component = null, message:String){
+	  Dialog.showMessage(parent,
+      message = message,
+      title = "Error",
+      messageType = Dialog.Message.Error)
   }
 
 }
