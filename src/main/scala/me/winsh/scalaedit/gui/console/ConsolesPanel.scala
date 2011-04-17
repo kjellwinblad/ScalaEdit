@@ -16,7 +16,7 @@ tabLayoutPolicy = TabbedPane.Layout.Scroll
 
   def addSBTTerminal() {
 
-    pages += new TabbedPane.Page("SBT Terminal", new SBTConsolePanel())
+    pages += new TabbedPane.Page("SBT Terminal", new SBTConsoleWithErrorList())
      
     peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this, Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")))
   }
