@@ -11,10 +11,10 @@ import me.winsh.scalaedit.gui.editor._
 import me.winsh.scalaedit.gui.project._
 import me.winsh.scalaedit.gui.console._
 
-class MainWindow extends MainFrame {
+class MainWindow extends Frame {
 
   val version = "0.0.3"
-
+ 
   title = "ScalaEdit (" + version + ")"
 
   iconImage = Utils.getImage("/images/img3.png")
@@ -27,6 +27,12 @@ class MainWindow extends MainFrame {
 
   val fileBuffers: Array[FileBuffer] = Array[FileBuffer]()
 
+  
+  def shutDownOpenResources(){
+	  editorsPanel.shutDownAllOpenResources()
+	  consolesPanel.shutDownAllOpenResources()
+  }
+  
   menuBar = new MenuBar() {
 
     val fileMenu = new Menu("File") {

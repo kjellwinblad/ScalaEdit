@@ -30,7 +30,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
   private class SBTProcess extends InOutSource {
 
-    private val process = {
+    val process = {
       //Check if SBT is in properties dir
 
       val sbtJarName = "sbt-launch-0.7.5.jar"
@@ -84,7 +84,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
     }
     private val in = process.getInputStream
     private val err = process.getErrorStream
-    private val out = process.getOutputStream
+    val out = process.getOutputStream
     private val onlyOneStreamLeft = new AtomicBoolean(false)
 
     private val readQueue = new ArrayBlockingQueue[Int](1024, false)
@@ -126,7 +126,12 @@ class SBTConsolePanel extends VT320ConsoleBase {
   }
 
   def close() = {
+	  
+	sbtProcess.out.write("\n\nexit\n".map(_.toByte).toArray)
+	sbtProcess.out.flush()
     stop()
+    //In case it has not terminated with the exit command
+    sbtProcess.process.destroy()
     true
   }
 

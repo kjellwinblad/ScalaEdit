@@ -4,14 +4,18 @@ import me.winsh.scalaedit.gui.MainWindow
 import scala.swing._
 import java.awt.Toolkit
 import java.awt.Point
-/**  
+/**   
  * @author Kjell Winblad
  */
 object Main extends SimpleSwingApplication {
- 
+  
+	val window = new MainWindow(){
+		override def closeOperation { 
+			quit()
+		}
+	}
+	
   def top = {
-
-    val window = new MainWindow()
 
     // Get the size of the screen
     val dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -28,6 +32,11 @@ object Main extends SimpleSwingApplication {
     
     window.visible = true
     window
+  }
+   
+  
+  override def shutdown() {
+	 window.shutDownOpenResources() 
   }
 
 }

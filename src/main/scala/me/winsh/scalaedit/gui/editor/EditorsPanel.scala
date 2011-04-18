@@ -3,6 +3,7 @@ package me.winsh.scalaedit.gui.editor
 import scala.swing._
 import me.winsh.scalaedit.api.FileBuffer
 import me.winsh.scalaedit.api.CodeNotification
+import me.winsh.scalaedit.api.Closeable
 import me.winsh.scalaedit.gui._
 import scala.collection.mutable.HashMap
 import java.io.File
@@ -12,6 +13,12 @@ abstract class EditorsPanel extends TabbedPane {
   val bufferToEditorMap = HashMap[FileBuffer, EditorPanel]()
 
   tabLayoutPolicy = TabbedPane.Layout.Scroll
+
+  def shutDownAllOpenResources() {
+    pages.foreach((page) => {
+      page.content.asInstanceOf[Closeable].close()
+    })
+  }
 
   def isBufferInPanel(buffer: FileBuffer) = pages.exists((e) => {
     if (e.content.isInstanceOf[EditorPanel]) {
@@ -81,7 +88,7 @@ abstract class EditorsPanel extends TabbedPane {
           }
         case Nil => Unit
       }
-    
+
     notifyAboutCodeInfoWithoutSavingInfos(notifications)
   }
 

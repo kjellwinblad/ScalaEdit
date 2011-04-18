@@ -215,8 +215,6 @@ class SBTConsoleWithErrorList extends ConsolePanel {
 
       toMatchOn.toString match {
         case beginning(s) => {
-
-        	println("beginning")
           EditorsPanel().notifyAboutClearCodeInfo()
           toMatchOn = new StringBuffer()
         } case FirstErrorLine(fileName, lineNumber, message) => {
@@ -248,7 +246,6 @@ class SBTConsoleWithErrorList extends ConsolePanel {
         } case end(s) => {
 
           errorList.listData = codeNotifications.reverse
-println("end")
           EditorsPanel().notifyAboutCodeInfo(codeNotifications)
 
           codeNotifications = Nil
