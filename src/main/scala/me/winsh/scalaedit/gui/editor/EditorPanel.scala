@@ -72,7 +72,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     def add(a: ToggleButton) = super.add(a.peer)
 
     add(saveAction)
-    //add(saveAsAction)
+    add(saveAsAction)
     add(new JToolBar.Separator)
     add(undoAction)
     add(redoAction)

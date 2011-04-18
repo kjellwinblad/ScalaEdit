@@ -75,7 +75,7 @@ class MainWindow extends Frame {
         icon = Utils.getIcon("/images/small-icons/actions/exit.png")
 
         def apply() {
-          dispose()
+          closeOperation()
         }
 
       })
