@@ -8,8 +8,9 @@ import java.awt.Point
  * @author Kjell Winblad
  */
 object Main extends SimpleSwingApplication {
-
+ 
   def top = {
+
     val window = new MainWindow()
 
     // Get the size of the screen

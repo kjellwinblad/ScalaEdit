@@ -9,8 +9,10 @@ import scala.swing._
 
 object Utils {
 
-  def bestFileChooserDir = new File(".")
+  var bestFileChooserDir = projectDir
 
+  var projectDir = new File(".")
+  
   def clipboardContents_=(contentToSet: String) {
     val stringSelection = new StringSelection(contentToSet);
     val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

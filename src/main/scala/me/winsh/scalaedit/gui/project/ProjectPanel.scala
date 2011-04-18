@@ -41,16 +41,6 @@ class ProjectPanel extends BorderPanel {
 
     expandRow(0)
 
-    private val item = new MenuItem(new Action("Change Root...") {
-      icon = Utils.getIcon("/images/small-icons/mimetypes/folder.png")
-      def apply = println("Hello World");
-    })
-    //SO FAR SO GOOD, NOW FOR THE UGLY BIT!
-    val popup = new javax.swing.JPopupMenu
-    popup.add(item.peer)
-
-    this.peer.setComponentPopupMenu(popup)
-
   }
 
   val scrollPane = new ScrollPane(editableFileSystemTree)

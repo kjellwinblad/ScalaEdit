@@ -66,12 +66,18 @@ class SBTConsolePanel extends VT320ConsoleBase {
           sbtStream.close()
 
         }
-        Runtime.getRuntime().exec(Array("java", "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot"))
+
+        val pb = new ProcessBuilder(javaPath, "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot");
+
+        pb.directory(Utils.projectDir)
+        
+        pb.start()
+
       } catch {
         case e => {
           Utils.showErrorMessage(message = "<html>Could not lunch SBT. Trying to lunch command \"sbt\". <br/>" + e.getMessage())
           e.printStackTrace()
-          Runtime.getRuntime().exec("sbt")
+          null
         }
       }
 
@@ -123,7 +129,5 @@ class SBTConsolePanel extends VT320ConsoleBase {
     stop()
     true
   }
-
-
 
 }
