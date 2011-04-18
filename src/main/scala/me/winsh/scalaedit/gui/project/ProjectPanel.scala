@@ -1,4 +1,4 @@
-package me.winsh.scalaedit.gui
+package me.winsh.scalaedit.gui.project
 
 import java.io.File
 import scala.xml._
@@ -7,6 +7,7 @@ import Swing._
 import scala.swing.event._
 import Tree._
 import java.awt.Color
+import me.winsh.scalaedit.gui._
 
 class ProjectPanel extends BorderPanel {
 

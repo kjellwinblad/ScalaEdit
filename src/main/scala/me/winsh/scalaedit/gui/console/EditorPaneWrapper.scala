@@ -1,4 +1,4 @@
-package me.winsh.scalaedit.gui
+package me.winsh.scalaedit.gui.console
 
 import scala.swing._
 import jsyntaxpane._
