@@ -18,6 +18,8 @@ import java.awt.event.FocusListener
 import java.awt.event.FocusEvent
 import scala.swing.Action
 import me.winsh.scalaedit.gui._
+import javax.swing.text.BadLocationException
+import scala.util.matching._
 
 class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
@@ -50,9 +52,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
       addSeparator()
       add(new MenuItem(selectAllAction))
     }).peer
-  };
-  
-  
+  }
 
   editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
 
@@ -65,7 +65,43 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   }
   private val editorWrapper = new EditorWrapper(scrollPane)
 
-  add(editorWrapper, BorderPanel.Position.Center)
+  private class EditorAndToolArea extends BorderPanel {
+
+    private var currentComponent: Option[Component] = None
+
+    private var removeAction: Option[Unit => Unit] = None
+
+    def setTool(component: Component, onRemove: Unit => Unit) {
+      setTool(component)
+      removeAction = Some(onRemove)
+    }
+
+    def setTool(component: Component) {
+      removeTool()
+      add(component, BorderPanel.Position.North)
+      peer.revalidate()
+      currentComponent = Some(component)
+    }
+    def removeTool() {
+
+      if (removeAction != None)
+        (removeAction.get)()
+
+      currentComponent match {
+        case Some(c) => {
+          peer.remove(c.peer)
+          peer.revalidate()
+          currentComponent = None
+        }
+        case None =>
+      }
+    }
+
+    add(editorWrapper, BorderPanel.Position.Center)
+  }
+  private val editorAndToolArea = new EditorAndToolArea()
+
+  add(editorAndToolArea, BorderPanel.Position.Center)
 
   object toolBar extends JToolBar {
     def add(a: Action) = super.add(a.peer)
@@ -76,6 +112,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     add(new JToolBar.Separator)
     add(undoAction)
     add(redoAction)
+    add(new JToolBar.Separator)
+    add(searchAction)
+    add(gotoLineAction)
     //add(new JToolBar.Separator)
     //add(cutAction)
     //add(copyAction)
@@ -236,11 +275,203 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     }
   }
 
-  // editorPane.setPopupMenu((new PopupMenu() {
-  //   add(new MenuItem(cutAction))
-  //   add(new MenuItem(copyAction))
-  //   add(new MenuItem(pasteAction))
-  // }).peer)
+  object searchAction extends Action("") {
+
+    toolTip = "Search or Search and Replace <i>(control+f)</i>"
+
+    icon = Utils.getIcon("/images/small-icons/find.png")
+
+    var focusComponent: Component = null
+
+    def apply() {
+      editorAndToolArea.setTool(new BoxPanel(Orientation.Vertical) {
+
+        private var resultIterator: Regex.MatchIterator = null
+        private var lastSearchString: Option[String] = None
+        private var currentSelectionSize = 0
+        private var selectionChangeDueToReplacement = 0
+        private val find = new Action("Find") {
+
+          mnemonic = KeyEvent.VK_F
+
+          private def initResultIterator() {
+            currentSelectionSize = 0
+            selectionChangeDueToReplacement = 0
+
+            lastSearchString = Some(findField.text)
+
+            val sensitive = caseSensitiveCheckBox.selected
+
+            val findRegExp = ((if (sensitive) "" else ("(?i)")) + findField.text).r
+
+            resultIterator = findRegExp.findAllIn(editorPane.getText)
+
+          }
+
+          def apply() {
+
+            if (lastSearchString != Some(findField.text))
+              initResultIterator()
+
+            if (!resultIterator.hasNext) {
+              initResultIterator()
+              infoLabel.text = "End reached!"
+            } else {
+              editorPane.select(resultIterator.start + selectionChangeDueToReplacement,
+                resultIterator.end + selectionChangeDueToReplacement)
+              currentSelectionSize = resultIterator.end - resultIterator.start
+              resultIterator.next()
+            }
+          }
+        }
+
+        private val close = new Action("Close") {
+
+          mnemonic = KeyEvent.VK_O
+          def apply() {
+
+            editorAndToolArea.removeTool
+            editorPane.setEditable(true)
+            editorPane.requestFocus()
+
+          }
+        }
+        private val findField: TextField = new TextField(20) {
+          action = find
+        }
+
+        private val caseSensitiveCheckBox = new CheckBox("Case sensitive") {
+          selected = false
+        }
+        private val infoLabel = new Label("<html><i>(Tip: Java regexp)</i>")
+        contents += new FlowPanel(FlowPanel.Alignment.Left)() {
+
+          contents += findField
+          focusComponent = findField
+          contents += new Button(find)
+          contents += new Button(close)
+          contents += caseSensitiveCheckBox
+          contents += infoLabel
+
+        }
+
+        contents += new FlowPanel(FlowPanel.Alignment.Left)() {
+
+          private val replace = new Action("Replace") {
+            def apply() {
+
+              mnemonic = KeyEvent.VK_P
+
+              if (currentSelectionSize != 0) {
+
+                selectionChangeDueToReplacement = selectionChangeDueToReplacement +
+                  (replaceField.text.size - currentSelectionSize)
+                val selStart = editorPane.getSelectionStart
+                editorPane.replaceSelection(replaceField.text)
+                if (selStart >= 0) {
+                  editorPane.select(selStart, selStart + replaceField.text.size)
+                  currentSelectionSize = replaceField.text.size
+                }
+              }
+            }
+          }
+
+          private val replaceAndFind = new Action("Replace/Find") {
+            mnemonic = KeyEvent.VK_E
+
+            def apply() {
+
+              replace()
+
+              find()
+            }
+          }
+
+          private val replaceAll = new Action("Replace All") {
+
+            mnemonic = KeyEvent.VK_A
+            def apply() {
+
+              val sensitive = caseSensitiveCheckBox.selected
+
+              val findRegExp = ((if (sensitive) "" else ("(?i)")) + findField.text).r
+
+              val replacedText = findRegExp.replaceAllIn(editorPane.getText, replaceField.text)
+
+              editorPane.setText(replacedText)
+
+              close()
+            }
+          }
+
+          private val replaceField: TextField = new TextField(20) {
+            action = replaceAndFind
+          }
+          contents += replaceField
+
+          contents += new Button(replace)
+          contents += new Button(replaceAndFind)
+          contents += new Button(replaceAll)
+
+        }
+
+      }, Unit=>{editorPane.setEditable(true)})
+
+      focusComponent.requestFocus()
+      editorPane.setEditable(false)
+
+    }
+  }
+
+  object gotoLineAction extends Action("") {
+
+    toolTip = "Goto Line <i>(control+l)</i>"
+
+    var wrapLines = false
+
+    icon = Utils.getIcon("/images/small-icons/goto-line.png")
+
+    var focusComponent: Component = null
+
+    def apply() {
+      editorAndToolArea.setTool(new FlowPanel(FlowPanel.Alignment.Left)() {
+
+        private val gotoLine = new Action("Goto Line") {
+        	
+          mnemonic = KeyEvent.VK_G
+          
+          def apply() {
+            try {
+              val selectedLineNumber: Int = lineNumberField.text.toInt match {
+                case n if (n >= 1) => n
+                case n => 1
+              }
+              editorPane.setCaretPosition(editorPane.getLineStartOffset(selectedLineNumber - 1))
+
+            } catch {
+              case e: BadLocationException => {
+                //A line that does not exist. Set current pos to last line
+                editorPane.setCaretPosition(editorPane.getLineStartOffset(editorPane.getText().lines.toList.size - 1))
+              }
+              case _ => //Ignore 
+            }
+            finally {
+              editorAndToolArea.removeTool()
+            }
+          }
+        }
+
+        private val lineNumberField: TextField = new TextField(10) {
+          action = gotoLine
+        }
+        contents += lineNumberField
+        focusComponent = lineNumberField
+        contents += new Button(gotoLine)
+      })
+      focusComponent.requestFocus()
+
+    }
+  }
 
   private def changeToSavedIcon() {
 
@@ -250,15 +481,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   editorPane.addFocusListener(new FocusListener() {
     def focusGained(e: FocusEvent) {
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), searchAction.peer)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK), gotoLineAction.peer)
     }
 
     def focusLost(e: FocusEvent) {
-      //editorPane.getKeymap().removeBindings()
     }
   })
 
-  editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer) 
-	  
   def close() = if (!saved) {
     val result = Dialog.showOptions(this,
       message = ("\"" + fileBuffer.file.getOrElse("New File") + "\" has been modified. Save changes?"),
@@ -278,14 +508,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     }
 
   } else true
-  
-  def notifyAboutCodeInfo(notification:CodeNotification):Unit = notification match {
-	  case Error(_,line,_) => editorPane.addLineHighlight(line - 1, java.awt.Color.RED)
-	  case Warning(_,line,_) => editorPane.addLineHighlight(line, java.awt.Color.YELLOW)
+
+  def notifyAboutCodeInfo(notification: CodeNotification): Unit = notification match {
+    case Error(_, line, _) => editorPane.addLineHighlight(line - 1, java.awt.Color.RED)
+    case Warning(_, line, _) => editorPane.addLineHighlight(line, java.awt.Color.YELLOW)
   }
-  
-   def notifyAboutClearCodeInfo() {
-	 editorPane.removeAllLineHighlights()
+
+  def notifyAboutClearCodeInfo() {
+    editorPane.removeAllLineHighlights()
   }
 
   private def syntaxStyleFromContentType(contentType: String) = contentType.toLowerCase match {

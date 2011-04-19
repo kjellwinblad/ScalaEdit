@@ -1,5 +1,5 @@
 package me.winsh.scalaedit
- 
+
 import me.winsh.scalaedit.gui.MainWindow
 import scala.swing._
 import java.awt.Toolkit
@@ -14,6 +14,7 @@ object Main extends SimpleSwingApplication {
 			quit()
 		}
 	}
+
 	
   def top = {
 

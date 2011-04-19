@@ -13,7 +13,7 @@ import me.winsh.scalaedit.gui.console._
 
 class MainWindow extends Frame {
 
-  val version = "0.0.3"
+  val version = "0.0.9"
  
   title = "ScalaEdit (" + version + ")"
 
