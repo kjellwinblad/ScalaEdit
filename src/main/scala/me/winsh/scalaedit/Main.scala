@@ -15,7 +15,6 @@ object Main extends SimpleSwingApplication {
 		}
 	}
 
-	
   def top = {
 
     // Get the size of the screen

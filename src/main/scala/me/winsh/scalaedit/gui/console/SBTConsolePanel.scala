@@ -70,7 +70,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
         val pb = new ProcessBuilder(javaPath, "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot");
 
         pb.directory(Utils.projectDir)
-        
+
         pb.start()
 
       } catch {
@@ -93,13 +93,20 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
       def readFromStream(in: InputStream) {
 
-        in.read() match {
-          case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
-          case -1 => onlyOneStreamLeft.set(true)
-          case v => {
-            readQueue.put(v)
-            readFromStream(in) //Recursive call
+        try {
+          in.read() match {
+            case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
+            case -1 => onlyOneStreamLeft.set(true)
+            case v => {
+              readQueue.put(v)
+              readFromStream(in) //Recursive call
+            }
           }
+
+        } catch {
+          case _ =>
+          //Do nothing just let the reading terminate
+          //Probably caused by forced termination of the process
         }
       }
 
@@ -126,12 +133,16 @@ class SBTConsolePanel extends VT320ConsoleBase {
   }
 
   def close() = {
-	  
-	sbtProcess.out.write("\n\nexit\n".map(_.toByte).toArray)
-	sbtProcess.out.flush()
-    stop()
-    //In case it has not terminated with the exit command
-    sbtProcess.process.destroy()
+
+    try {
+      sbtProcess.out.write("\n\nexit\n".map(_.toByte).toArray)
+      sbtProcess.out.flush()
+      stop()
+      //In case it has not terminated with the exit command
+      sbtProcess.process.destroy()
+    } catch {
+      case _ => //Ignore, this could be that the stream is closed or similar
+    }
     true
   }
 
