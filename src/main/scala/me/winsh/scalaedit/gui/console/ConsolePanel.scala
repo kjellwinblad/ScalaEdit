@@ -8,6 +8,8 @@ abstract class ConsolePanel extends BorderPanel with Closeable{
   abstract class ConsoleType
 
   case object ScalaConsole extends ConsoleType
+
+  case object StandAloneScalaConsole extends ConsoleType
   
   case object SBTConsole extends ConsoleType
 

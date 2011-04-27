@@ -23,6 +23,7 @@ import java.io.File
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import scala.util.matching.Regex
+import scala.annotation.tailrec
 
 class SBTConsolePanel extends VT320ConsoleBase {
 
@@ -33,7 +34,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
     val process = {
       //Check if SBT is in properties dir
 
-      val sbtJarName = "sbt-launch-0.7.5.jar"
+      val sbtJarName = "sbt-launch-0.7.6.RC0.jar"
 
       try {
         val javaFile = new File(new File(System.getProperty("java.home"), "bin"), "java")
@@ -91,9 +92,9 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
     val input = new InputStream {
 
+      @tailrec
       def readFromStream(in: InputStream) {
 
-        try {
           in.read() match {
             case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
             case -1 => onlyOneStreamLeft.set(true)
@@ -102,16 +103,10 @@ class SBTConsolePanel extends VT320ConsoleBase {
               readFromStream(in) //Recursive call
             }
           }
-
-        } catch {
-          case _ =>
-          //Do nothing just let the reading terminate
-          //Probably caused by forced termination of the process
-        }
       }
 
-      Utils.runInNewThread(() => readFromStream(in))
-      Utils.runInNewThread(() => readFromStream(err))
+      Utils.runInNewThread(() => try{readFromStream(in)}catch{case _ =>})
+      Utils.runInNewThread(() => try{readFromStream(err)}catch{case _ =>})
 
       def read(): Int = readQueue.take()
 

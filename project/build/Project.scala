@@ -5,7 +5,7 @@ import de.element34.sbteclipsify._
 import assembly._
 
 class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify  with AssemblyBuilder{
-  lazy val projectScalaVersion = "2.8.1"
+  lazy val projectScalaVersion = "2.9.0.RC2"
   lazy val mainJar = "target/scala_" + projectScalaVersion + "/" +
     projectName.value + "_" + projectScalaVersion + "-" + projectVersion.value + ".jar"
   lazy val dependencyJars = new File("lib").listFiles.filter(_.getName.endsWith(".jar")).map(_.getAbsolutePath)

@@ -97,13 +97,13 @@ trait VT320ConsoleBase extends ConsolePanel {
       while (running) {
 
         val b = inOutSource.input.read();
-
+			  
         invokeOnConsoleOutput.foreach(func => func(b))
         scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
         b match {
           case -1 => running = false
           case 10 => {
-            emulation.putString("" + 10.toChar + 13.toChar)
+            emulation.putString("" + 10.toChar + 13.toChar + " ")
             //scrollPane.horizontalScrollBar.value = scrollPane.horizontalScrollBar.maximum
             scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
           }
@@ -134,9 +134,16 @@ trait VT320ConsoleBase extends ConsolePanel {
    */
   def putLine(str: String) {
     emulation.putString(str + 10.toChar + 13.toChar)
+    scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
   }
 
-  for (_ <- 0 to (linesInEmulator - 6)) { putLine("") }
+	putLine(" Loading...")
+
+  for (_ <- 0 to (linesInEmulator - 8)) { putLine("") }
+  
+  putLine("")
+  
+  emulation.putString(" ")
 
   //Disable arrow keys in scroll pane
 

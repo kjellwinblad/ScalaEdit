@@ -9,17 +9,21 @@ class ConsolesPanel extends TabbedPane {
 tabLayoutPolicy = TabbedPane.Layout.Scroll
 
   def addScalaTerminal() {
-
-    pages += new TabbedPane.Page("Scala Terminal", new ScalaConsolePanel())
-     
-    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this, Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")))
+		addTerminal("Scala Terminal", new StandAloneScalaConsolePanel(), "/images/small-icons/illustrations/scala-terminal.png")
   }
 
   def addSBTTerminal() {
+		addTerminal("SBT Terminal", new SBTConsoleWithErrorList(), "/images/small-icons/illustrations/sbt-terminal.png")
+  }
 
-    pages += new TabbedPane.Page("SBT Terminal", new SBTConsoleWithErrorList())
+  def addTerminal(name:String, component:ConsolePanel, iconPath:String) {
+
+    pages += new TabbedPane.Page(name, component)
      
-    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this, Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")))
+    peer.setTabComponentAt(pages.size -1, new ButtonTabComponentImpl(this, Utils.getIcon(iconPath)))
+  
+  	peer.setSelectedComponent(component.peer)
+  	
   }
   
   def shutDownAllOpenResources(){

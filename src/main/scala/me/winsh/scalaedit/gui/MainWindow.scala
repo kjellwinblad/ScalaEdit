@@ -25,13 +25,12 @@ class MainWindow extends Frame {
 
   val projectsPanel = new ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
-  val fileBuffers: Array[FileBuffer] = Array[FileBuffer]()
-
-  
   def shutDownOpenResources(){
 	  editorsPanel.shutDownAllOpenResources()
 	  consolesPanel.shutDownAllOpenResources()
   }
+
+	maximize()
   
   menuBar = new MenuBar() {
 
@@ -170,9 +169,14 @@ class MainWindow extends Frame {
   }
   mainSplitPane.oneTouchExpandable = true
   
-  mainSplitPane.dividerLocation = 0.8
+  
 
   contents = mainSplitPane
+
+	mainSplitPane.dividerLocation = 0.2
+
+	mainSplitPane.editorProjectSplitPane.dividerLocation = 0.3
+  
   pack()
 
 }
