@@ -17,7 +17,6 @@ object Main extends SimpleSwingApplication {
 	}
 
   def top = {
-    
     window.visible = true
     window
   }

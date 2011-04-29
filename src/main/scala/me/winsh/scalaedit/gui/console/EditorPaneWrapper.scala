@@ -9,6 +9,6 @@ class EditorPaneWrapper extends Component {
   DefaultSyntaxKit.initKit()
 
   lazy val editorPane = peer.getViewport.getView.asInstanceOf[JEditorPane]
-
+ 
   override lazy val peer: JScrollPane = new JScrollPane(new JEditorPane())
 }

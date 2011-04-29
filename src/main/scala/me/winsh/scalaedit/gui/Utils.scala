@@ -7,7 +7,7 @@ import java.awt.datatransfer._
 import java.io.File
 import scala.swing._
 
-object Utils {
+object Utils { 
 
   var bestFileChooserDir = projectDir
 
@@ -49,20 +49,28 @@ object Utils {
 
   def getIcon(classPathPath: String) = new ImageIcon(this.getClass.getResource(classPathPath))
 
-  def swingInvokeLater(fun: () => Unit) {
-    SwingUtilities.invokeLater(new Runnable {
-      def run {
-        fun()
-      }
-    })
+  def swingInvokeAndWait(fun: () => Unit) {
+
+  	if(SwingUtilities.isEventDispatchThread())
+  		fun()
+  	else
+    	SwingUtilities.invokeAndWait(new Runnable {
+      	def run {
+        	fun()
+      	}
+    	})
   }
 
-  def swingInvokeAndWait(fun: () => Unit) {
-    SwingUtilities.invokeAndWait(new Runnable {
-      def run {
-        fun()
-      }
-    })
+  def swingInvokeLater(fun: () => Unit) {
+
+  	if(SwingUtilities.isEventDispatchThread())
+  		fun()
+  	else
+    	SwingUtilities.invokeLater(new Runnable {
+      	def run {
+        	fun()
+      	}
+    	})
   }
 
   def runInNewThread(fun: () => Unit) {

@@ -181,4 +181,3 @@ public class ButtonTabComponent extends JPanel{
         }
     };
 }
-

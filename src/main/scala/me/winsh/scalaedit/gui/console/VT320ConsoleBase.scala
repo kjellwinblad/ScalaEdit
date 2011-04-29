@@ -61,7 +61,7 @@ trait VT320ConsoleBase extends ConsolePanel {
 
       icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
 
-      def apply() = inOutSource.output.write(Utils.clipboardContents.map(_.toByte).toArray)
+      def apply() = inOutSource.output.write(Utils.clipboardContents.replaceAll("\t","  ").map(_.toByte).toArray)
 
     }))
   }).peer
@@ -97,17 +97,17 @@ trait VT320ConsoleBase extends ConsolePanel {
       while (running) {
 
         val b = inOutSource.input.read();
-			  
-        invokeOnConsoleOutput.foreach(func => func(b))
-        scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+
+			  Utils.swingInvokeLater(() => invokeOnConsoleOutput.foreach(func => func(b)))
+        //scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
         b match {
           case -1 => running = false
           case 10 => {
-            emulation.putString("" + 10.toChar + 13.toChar + " ")
+            putString("" + 10.toChar + 13.toChar + " ")
             //scrollPane.horizontalScrollBar.value = scrollPane.horizontalScrollBar.maximum
-            scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+            //scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
           }
-          case b => emulation.putString("" + b.toChar)
+          case b => putString("" + b.toChar)
         }
 
       }
@@ -132,18 +132,28 @@ trait VT320ConsoleBase extends ConsolePanel {
    * puts a string to the terminal and move the input position to the next line
    * @param str
    */
-  def putLine(str: String) {
-    emulation.putString(str + 10.toChar + 13.toChar)
+  def putString(str: String) = Utils.swingInvokeLater(() => {
+    emulation.putString(str)
     scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+  })
+
+  /**
+   * puts a string to the terminal and move the input position to the next line
+   * @param str
+   */
+  def putLine(str: String) {
+  	putString(str + 10.toChar + 13.toChar) 
   }
 
 	putLine(" Loading...")
 
   for (_ <- 0 to (linesInEmulator - 8)) { putLine("") }
   
-  putLine("")
+  putLine(" Loading...")
+
+	putLine("")
   
-  emulation.putString(" ")
+  putString(" ")
 
   //Disable arrow keys in scroll pane
 

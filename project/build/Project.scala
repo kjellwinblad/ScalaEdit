@@ -24,11 +24,19 @@ class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Ecli
         val in = Source.fromInputStream(p.getInputStream)
         val err = Source.fromInputStream(p.getErrorStream)
 
-        for (l <- in.getLines)
-          println(l)
+				new Thread(){
+					override def run(){
+						for (l <- in.getLines)
+          		println(l)
+					}
+				}.start()
 
-        for (l <- err.getLines)
-          println(l)
+				new Thread(){
+					override def run(){
+        		for (l <- err.getLines)
+          		println(l)
+					}
+				}.start()
 
         None
       } dependsOn (`package`)
