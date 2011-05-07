@@ -51,8 +51,12 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
         }
 				
 				val classPath = System.getProperty("java.class.path")
-
-        val pb = new ProcessBuilder(javaPath, "-cp", classPath, "scala.tools.nsc.MainInterpreter", "-usejavacp")
+				
+				val pb = if(System.getProperty("os.name").toLowerCase.contains("windows")){
+					echoInput = true
+        	new ProcessBuilder(javaPath, "-Djline.terminal=NONE","-cp", classPath, "scala.tools.nsc.MainInterpreter", "-usejavacp")
+				}else
+        	new ProcessBuilder(javaPath,"-cp", classPath, "scala.tools.nsc.MainInterpreter", "-usejavacp")
 
         pb.directory(Utils.projectDir)
 
@@ -102,25 +106,25 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 
   }
 
-  private var sbtProcess: ScalaProcess = null
+  private var scalaProcess: ScalaProcess = null
 
   def inOutSource: InOutSource = {
-    if (sbtProcess == null)
-      sbtProcess = new ScalaProcess()
+    if (scalaProcess == null)
+      scalaProcess = new ScalaProcess()
 
-    sbtProcess
+    scalaProcess
   }
 
   def close() = {
-
     try {
-      sbtProcess.out.write("\n\nsys.exit()\n".map(_.toByte).toArray)
-      sbtProcess.out.flush()
+      scalaProcess.out.write("\n\nsys.exit()\n".map(_.toByte).toArray)
+      scalaProcess.out.flush()
       stop()
-      //In case it has not terminated with the exit command
-      sbtProcess.process.destroy()
     } catch {
       case _ => //Ignore, this could be that the stream is closed or similar
+    }finally{
+    	//Make sure that it really is dead
+    	scalaProcess.process.destroy()
     }
     true
   }

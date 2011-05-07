@@ -68,7 +68,14 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
         }
 
-        val pb = new ProcessBuilder(javaPath, "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot");
+				val classPath = System.getProperty("java.class.path")
+				println(System.getProperty("os.name"))
+
+				val pb = if(System.getProperty("os.name").toLowerCase.contains("windows")){
+					echoInput = true
+        	new ProcessBuilder(javaPath, "-Djline.terminal=jline.UnsupportedTerminal", "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot")
+				}else
+        	new ProcessBuilder(javaPath, "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot")
 
         pb.directory(Utils.projectDir)
 
@@ -133,10 +140,12 @@ class SBTConsolePanel extends VT320ConsoleBase {
       sbtProcess.out.write("\n\nexit\n".map(_.toByte).toArray)
       sbtProcess.out.flush()
       stop()
-      //In case it has not terminated with the exit command
-      sbtProcess.process.destroy()
+
     } catch {
       case _ => //Ignore, this could be that the stream is closed or similar
+    }finally{
+    	//In case it has not terminated with the exit command
+      sbtProcess.process.destroy()
     }
     true
   }

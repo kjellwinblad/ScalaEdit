@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel {
 
-	val autorefreshIntervallSeconds = 2
+	val autorefreshIntervallSeconds = 5
 
   var tree = new ProjectTree(Utils.projectDir)
 
@@ -92,10 +92,86 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 			def	treeExpanded(event:JTreeExpansionEvent):Unit =  addExpandedPath(event.getPath)
     })
 
+    def selectedPath = peer.getSelectionPath()
 
+    val popupMenu = (new PopupMenu() {
 
-    val popup = (new PopupMenu() {
+			def selectedOrRoot = {
+				val selFile = if(!selection.empty)
+      		selectedPath.getLastPathComponent().asInstanceOf[File]
+      	else
+      		projectRoot
+
+      	if(selFile.isDirectory) selFile else selFile.getParentFile
+			}
+
+			def existsAndShowMessageIfItDoes(file:File) = if(file.exists){
+				Dialog.showMessage (
+					message = "The file:\n" + file.getCanonicalPath() + "\n, already exists.", 
+					title = "File Exists")
+				true
+			}else false
+
+			def createAction(itemName:String, createAction:(File)=>Unit){
+				val file = selectedOrRoot
+      	Dialog.showInput(
+      		message = itemName + " name:" + (-50 to file.getCanonicalPath().size).map((a)=>" ").mkString(""), 
+      		title = "New " + itemName,
+      		initial = file.getCanonicalPath() + File.separator) match{
+      			case Some(path) if(!existsAndShowMessageIfItDoes(new File(path)))=> {
+      				createAction(new File(path))
+      				refreshAction()
+      			}
+      			case None => 
+      		}
+			}
+    	
+    	add(new MenuItem(new Action("New File...") {
+      	icon = Utils.getIcon("/images/small-icons/actions/filenew.png")
+      	def apply() = createAction("File", (f:File)=>{
+      		f.getParentFile.mkdirs
+      		f.createNewFile()
+      	})
+    	}))
+    	add(new MenuItem(new Action("New Directory...") {
+      	icon = Utils.getIcon("/images/small-icons/actions/fileopen.png")
+      	def apply() = createAction("Directory", (d:File)=>d.mkdirs)
+    	}))
+    	add(new MenuItem(new Action("Delete Selected...") {
+      	icon = Utils.getIcon("/images/small-icons/actions/editdelete.png")
+      	def apply() = if(!selection.empty) {
+      		val file = selectedPath.getLastPathComponent().asInstanceOf[File]
+      		Dialog.showConfirmation (
+      			message = "Do you want to delete:\n" + file.getCanonicalPath() + " ?", 
+      			title = "Delete?" ) match{
+      				case Dialog.Result.Yes => {
+      					file.delete()
+      					refreshAction()
+      				}
+      			}
+      	}
+    	}))
+    	
       addSeparator()
+    	
+    	add(new MenuItem(new Action("Expand All From Selected") {
+      	icon = Utils.getIcon("/images/small-icons/go-up.png")
+      	def apply() = if(!selection.empty) {
+
+					def expandAllFromSelected(selectedPath:TreePath){
+						expandPath(selectedPath)
+						selectedPath.getLastPathComponent().asInstanceOf[File].listFiles().foreach((file)=>if(file.isDirectory){
+							expandAllFromSelected(selectedPath.pathByAddingChild(file))
+						})
+					}
+
+					expandAllFromSelected(selectedPath)
+      		 
+      	}
+    	}))
+      
+      addSeparator()
+      
       add(new MenuItem(new Action("Change Root...") {
       	icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
       	def apply() = changeRootAction()
@@ -118,7 +194,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     	})
     }).peer
     
-    this.peer.setComponentPopupMenu(popup)
+    this.peer.setComponentPopupMenu(popupMenu)
 
   }
 

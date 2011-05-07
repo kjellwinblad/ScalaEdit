@@ -10,10 +10,12 @@ import javax.swing.JOptionPane
 import me.winsh.scalaedit.gui.editor._
 import me.winsh.scalaedit.gui.project._
 import me.winsh.scalaedit.gui.console._
+import java.awt.Desktop
+import java.net.URI
 
 class MainWindow extends Frame {
 
-  val version = "0.1.0"
+  val version = "0.1.2"
  
   title = "ScalaEdit (" + version + ")"
 
@@ -138,6 +140,30 @@ class MainWindow extends Frame {
 
       })
 
+      //contents += new MenuItem(Action("Licenses") {
+
+      //})
+
+			contents += new Separator()
+
+			val desktop = Desktop.getDesktop
+			
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Scala API</u></font>"""){
+      	desktop.browse(new URI("http://www.scala-lang.org/api/current/index.html"))
+      })
+
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Java API</u></font>"""){
+      	desktop.browse(new URI("http://download.oracle.com/javase/6/docs/api/"))
+      })
+
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt documentation</u></font>"""){
+      	desktop.browse(new URI("http://code.google.com/p/simple-build-tool/"))
+      })
+
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>ScalaEdit Web Site</u></font>"""){
+      	desktop.browse(new URI("http://code.google.com/p/scala-edit/"))
+      })
+
     }
 
     contents += fileMenu
@@ -154,8 +180,10 @@ class MainWindow extends Frame {
 
   private val mainSplitPane = new SplitPane() {
     orientation = Orientation.Horizontal
+    resizeWeight = 1.0
 
     val editorProjectSplitPane = new SplitPane() {
+    	resizeWeight = 0.0
       orientation = Orientation.Vertical
       leftComponent = projectsPanel
       rightComponent = editorsPanel
@@ -168,15 +196,20 @@ class MainWindow extends Frame {
 
   }
   mainSplitPane.oneTouchExpandable = true
-  
-  
 
+	preferredSize = new Dimension(800,800)
+
+	size = new Dimension(800,800)
+	
   contents = mainSplitPane
 
-	mainSplitPane.dividerLocation = 0.2
+	mainSplitPane.dividerLocation = 577
 
-	mainSplitPane.editorProjectSplitPane.dividerLocation = 0.3
-  
-  pack()
+	mainSplitPane.editorProjectSplitPane.dividerLocation = 200
+
+	maximized()
+	maximize()
+	
+	pack()
 
 }

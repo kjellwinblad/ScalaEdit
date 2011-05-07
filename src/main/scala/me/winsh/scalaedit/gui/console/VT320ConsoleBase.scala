@@ -15,8 +15,13 @@ import javax.swing.InputMap
 import javax.swing.KeyStroke
 import javax.swing.JComponent
 import java.awt.event.KeyEvent
+import java.awt.event.InputEvent
+import java.awt.event.FocusListener
+import java.awt.event.FocusEvent
 
 trait VT320ConsoleBase extends ConsolePanel {
+
+	var echoInput = false
 
   trait InOutSource {
     def input: InputStream
@@ -35,6 +40,12 @@ trait VT320ConsoleBase extends ConsolePanel {
 
   private val emulation: vt320 = new vt320(80, linesInEmulator) {
     def write(b: Array[Byte]) {
+    	if(echoInput){
+    		//Replace the byte 10 or 13 with 10,13
+    		val echoString = b.map((i)=>if(i==10 || i == 13) Array(10.toChar,13.toChar, ' ') else Array(i.toChar)).flatten.mkString("")
+    		putString(echoString)
+    	}
+    	//Thread.sleep(1000)
       inOutSource.output.write(b)
     }
     setLocalEcho(false)
@@ -64,6 +75,32 @@ trait VT320ConsoleBase extends ConsolePanel {
       def apply() = inOutSource.output.write(Utils.clipboardContents.replaceAll("\t","  ").map(_.toByte).toArray)
 
     }))
+
+		addSeparator()
+
+		val standardInput = new RadioMenuItem(""){
+			action = new Action("Standard Input Method"){
+				def apply (){
+					setToStandardInput()
+				}
+			}
+		}
+
+		val multilineInput = new RadioMenuItem(""){
+			action = new Action("Multiline Input Method"){
+				def apply (){
+					setToMultilineInput()
+				}
+			}
+		}
+
+		val inputMethodSelect = new ButtonGroup(standardInput, multilineInput)
+
+		inputMethodSelect.select(standardInput)
+    
+    add(standardInput)
+    add(multilineInput)
+    
   }).peer
 
   terminal.addMouseListener(new MouseAdapter() {
@@ -82,9 +119,72 @@ trait VT320ConsoleBase extends ConsolePanel {
     add(terminal, BorderLayout.CENTER)
   })) {
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.Never
+    preferredSize = new Dimension(450,700)
   }
 
-  add(scrollPane, BorderPanel.Position.Center)
+	def setToStandardInput(){
+		add(scrollPane, BorderPanel.Position.Center)
+		revalidate()
+	}
+
+	
+
+	def setToMultilineInput(){
+
+		val inputPanel = new BorderPanel{
+
+			val inputArea:TextArea = new TextArea(){
+				peer.addFocusListener(new FocusListener() {
+    			def focusGained(e: FocusEvent) {
+      			peer.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), enterAction.peer)
+    			}
+
+    			def focusLost(e: FocusEvent) {}
+  			})
+			}
+
+			val enterAction = new Action("Enter"){
+					mnemonic = KeyEvent.VK_E
+					accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK))
+					toolTip = "<html>Send to to terminal <i>(control+ENTER)</i>"
+					def apply(){
+						inOutSource.output.write((inputArea.text.replaceAll("\t","  ") + "\n").map(_.toByte).toArray)
+						inputArea.text = ""
+						inputArea.requestFocus()
+						
+					}
+				}
+			
+			add(new ScrollPane(inputArea),BorderPanel.Position.Center)
+
+			add(new Button(){
+				action = enterAction
+				//preferredSize = new Dimension(450,20)
+			},BorderPanel.Position.East)
+		}
+		val splitPane = new SplitPane(Orientation.Horizontal, left=scrollPane, right=inputPanel)
+		
+		splitPane.resizeWeight = 1.0
+
+		splitPane.preferredSize = new Dimension(300,300)
+
+		splitPane.dividerLocation = 0.9
+		
+		add(splitPane, BorderPanel.Position.Center)
+		
+		revalidate()
+
+		scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+
+		inputPanel.requestFocus()
+		
+	}
+
+	if(System.getProperty("os.name").toLowerCase.contains("windows"))
+		setToMultilineInput()
+	else
+		setToStandardInput()
+  
 
   private var running = false
 
@@ -137,6 +237,11 @@ trait VT320ConsoleBase extends ConsolePanel {
     scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
   })
 
+  def putStringAndWait(str: String) = Utils.swingInvokeAndWait(() => {
+    emulation.putString(str)
+    scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+  })
+
   /**
    * puts a string to the terminal and move the input position to the next line
    * @param str
@@ -147,9 +252,17 @@ trait VT320ConsoleBase extends ConsolePanel {
 
 	putLine(" Loading...")
 
-  for (_ <- 0 to (linesInEmulator - 8)) { putLine("") }
+  for (_ <- 0 to (linesInEmulator + 100)) { putLine("") }
   
   putLine(" Loading...")
+
+	putLine("")
+
+	if(System.getProperty("os.name").toLowerCase.contains("windows")){
+		putLine("OBS! Direct input to the terminal is known to work badly in Windows.")
+		putLine("Windows users are therefore recommended to use the multiline input method.")
+		putLine("This is because of a problem with JLine which is used in Scala and sbt.")
+	}
 
 	putLine("")
   

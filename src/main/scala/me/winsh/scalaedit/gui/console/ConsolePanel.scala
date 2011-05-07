@@ -17,4 +17,6 @@ abstract class ConsolePanel extends BorderPanel with Closeable{
 
   val consoleType: ConsoleType
 
+	preferredSize = new Dimension(700,200)
+
 }

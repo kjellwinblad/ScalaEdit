@@ -32,6 +32,4 @@ tabLayoutPolicy = TabbedPane.Layout.Scroll
 	  })
   }
 
-  addScalaTerminal()
-
 }
