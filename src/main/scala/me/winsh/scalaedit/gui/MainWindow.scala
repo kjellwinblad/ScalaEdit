@@ -140,9 +140,26 @@ class MainWindow extends Frame {
 
       })
 
-      //contents += new MenuItem(Action("Licenses") {
-
-      //})
+      contents += new Menu("Licenses") {
+				contents += new MenuItem(Action("ScalaEdit"){
+					EditorsPanel().addLicenseView("ScalaEdit License", "/licenses/scala_edit_license")
+				})
+				contents += new MenuItem(Action("RSyntaxTextArea"){
+					EditorsPanel().addLicenseView("RSyntaxTextArea License", "/licenses/rsyntaxtextarea_license")
+				})
+				contents += new MenuItem(Action("Scala"){
+					EditorsPanel().addLicenseView("Scala License", "/licenses/scala_licence")
+				})
+				contents += new MenuItem(Action("JLine"){
+					EditorsPanel().addLicenseView("JLine License", "/licenses/jline_license")
+				})
+				contents += new MenuItem(Action("Apache log4j"){
+					EditorsPanel().addLicenseView("Apache log4j License", "/licenses/log4j_license")
+				})
+				contents += new MenuItem(Action("JTA - Telnet/SSH for Java"){
+					EditorsPanel().addLicenseView("JTA License", "/licenses/jta_license")
+				})
+      }
 
 			contents += new Separator()
 

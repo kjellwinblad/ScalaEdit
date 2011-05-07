@@ -2,7 +2,6 @@ package me.winsh.scalaedit.gui.editor
 
 import me.winsh.scalaedit.api._
 import scala.swing._
-import jsyntaxpane._
 import javax.swing._
 import javax.swing.text._
 import javax.swing.event._

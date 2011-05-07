@@ -142,7 +142,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
       	def apply() = if(!selection.empty) {
       		val file = selectedPath.getLastPathComponent().asInstanceOf[File]
       		Dialog.showConfirmation (
-      			message = "Do you want to delete:\n" + file.getCanonicalPath() + " ?", 
+      			message = "Do you want to delete:\n" + file.getCanonicalPath + " ?", 
       			title = "Delete?" ) match{
       				case Dialog.Result.Yes => {
       					file.delete()
@@ -170,6 +170,16 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
       	}
     	}))
       
+      addSeparator()
+
+			add(new MenuItem(new Action("Copy Selected Path") {
+      	icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+      	def apply() = if(!selection.empty) {
+					val file = selectedPath.getLastPathComponent().asInstanceOf[File]
+					Utils.clipboardContents = file.getCanonicalPath
+      	}
+    	}))
+
       addSeparator()
       
       add(new MenuItem(new Action("Change Root...") {

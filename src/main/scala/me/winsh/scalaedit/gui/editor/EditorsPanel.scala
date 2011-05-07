@@ -70,6 +70,20 @@ abstract class EditorsPanel extends TabbedPane {
     editorPanel
   }
 
+  def addLicenseView(name:String, resourcePath:String) {
+
+      val tabComponent = new ButtonTabComponentImpl(this, () =>Unit);
+
+      val newEditorPanel = new LicenseView(resourcePath)
+
+      pages += new TabbedPane.Page(name, newEditorPanel)
+
+      peer.setTabComponentAt(pages.size - 1, tabComponent)
+
+      peer.setSelectedComponent(newEditorPanel.peer)
+
+  }
+
   private var currentNotifications: List[CodeNotification] = Nil
 
   def notifyAboutCodeInfo(notifications: List[CodeNotification]): Unit = {
