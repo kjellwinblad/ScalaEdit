@@ -69,7 +69,6 @@ class SBTConsolePanel extends VT320ConsoleBase {
         }
 
 				val classPath = System.getProperty("java.class.path")
-				println(System.getProperty("os.name"))
 
 				val pb = if(System.getProperty("os.name").toLowerCase.contains("windows")){
 					echoInput = true

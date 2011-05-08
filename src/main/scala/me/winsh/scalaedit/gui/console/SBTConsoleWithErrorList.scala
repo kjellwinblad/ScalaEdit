@@ -159,11 +159,11 @@ class SBTConsoleWithErrorList extends ConsolePanel {
 
   private var toMatchOn = new StringBuffer()
 
-  private val beginning = """(.*Compiling.*sources.*)\n""".r
+  private val beginning = """(?s)(.*Compiling.*sources.*)""".r
   
   private case object FirstErrorLine {
 
-    val regexpLine = """.*error.*0m(.*):(\d*):(.*)\e.*\n""" //""".*\[.*e.*r.*r.*o.*r.*\]0m(.*):([^:]*):\s*(.*)\n"""
+    val regexpLine = """(?s).*error.*0m(.*):(\d*):(.*)\e.*""" //""".*\[.*e.*r.*r.*o.*r.*\]0m(.*):([^:]*):\s*(.*)\n"""
 
     val le = regexpLine.r
 
@@ -180,11 +180,11 @@ class SBTConsoleWithErrorList extends ConsolePanel {
     }
   }
 
-  private val errorLine = """.*error.*0m.*0m(.*)\e.*\n""".r
+  private val errorLine = """(?s).*error.*0m.*0m(.*)\e.*""".r
 
   case object FirstWarningLine {
 
-    val regexpLine1 = """.*warn.*0m(.*):(\d*):(.*)\e.*\n"""
+    val regexpLine1 = """(?s).*warn.*0m(.*):(\d*):(.*)\e.*"""
 
     val le = regexpLine1.r
 
@@ -201,9 +201,9 @@ class SBTConsoleWithErrorList extends ConsolePanel {
     }
   }
 
-  private val warningLine = """.*warn.*0m.*0m(.*)\e.*\n""".r
+  private val warningLine = """(?s).*warn.*0m.*0m(.*)\e.*""".r
 
-  val end = """(.*==\s*compile\s*==.*)\n""".r
+  val end = """(?s)(.*==\s*compile\s*==.*)""".r
 
   var codeNotifications: List[CodeNotification] = Nil
   
@@ -212,7 +212,8 @@ class SBTConsoleWithErrorList extends ConsolePanel {
 
     //See if it matches something biginning, error, warning, end
     if (in == 10) {
-
+			println(toMatchOn.toString)
+      println(toMatchOn.toString.map(_.toInt)mkString(","))
       toMatchOn.toString match {
         case beginning(s) => {
           EditorsPanel().notifyAboutClearCodeInfo()

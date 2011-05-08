@@ -114,6 +114,27 @@ class MainWindow extends Frame {
         }
 
       })
+/*
+      contents += new Menu("Properties"){
+	      contents += new MenuItem(new Action("SBT Terminal Properties...") {
+	
+	        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
+	
+	        def apply() {
+	          consolesPanel.addSBTTerminal()
+	        }
+	
+	      })
+		    contents += new MenuItem(new Action("Scala Terminal Properties...") {
+	
+	        icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
+	
+	        def apply() {
+	          consolesPanel.addScalaTerminal()
+	        }
+	
+	      })
+      }*/
     }
 
     val helpMenu = new Menu("Help") {

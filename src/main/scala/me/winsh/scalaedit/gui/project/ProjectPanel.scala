@@ -53,23 +53,24 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     selection.mode = Tree.SelectionMode.Single
 
-    listenTo(selection)
-
-		private var ignoreSelection = false
-
-		def ignoreNextSelection() = ignoreSelection = true
+    listenTo(mouse.clicks)
 
     reactions += {
-    	case TreeNodeSelected(_) if(ignoreSelection) => ignoreSelection = false
-      case TreeNodeSelected(file) =>
-        file match {
-          case f: File if (!f.isDirectory) => {
-        	  fileSelectionHandler(f)
-        	  Utils.bestFileChooserDir = f.getParentFile
-          }
-          case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
-          case _ => Unit
+      case MousePressed (_, point, _, _, _) => {
+        val path = peer.getClosestPathForLocation(point.x, point.y)
+        if(peer.getPathBounds(path).contains(point)){
+        	tree.peer.setSelectionPath(path)
+        	val file = path.getLastPathComponent().asInstanceOf[File]
+	        file match {
+	          case f: File if (!f.isDirectory) => {
+	        	  fileSelectionHandler(f)
+	        	  Utils.bestFileChooserDir = f.getParentFile
+	          }
+	          case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
+	          case _ => Unit
+	        }        	
         }
+      }
     }
 
 		private var expandedPaths = Set[TreePath]()
@@ -233,7 +234,6 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     tree.treeData.peer.fireTreeStructureChanged(new TreePath(Utils.projectDir), Utils.projectDir)
     tree.expandRow(0)
     tree.expandAllManuallyExpanded()
-    tree.ignoreNextSelection()
     tree.peer.setSelectionPath(selection)
   }
 

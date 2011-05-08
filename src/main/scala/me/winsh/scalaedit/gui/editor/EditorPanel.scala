@@ -510,7 +510,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   def notifyAboutCodeInfo(notification: CodeNotification): Unit = notification match {
     case Error(_, line, _) => editorPane.addLineHighlight(line - 1, java.awt.Color.RED)
-    case Warning(_, line, _) => editorPane.addLineHighlight(line, java.awt.Color.YELLOW)
+    case Warning(_, line, _) => editorPane.addLineHighlight(line - 1, java.awt.Color.YELLOW)
   }
 
   def notifyAboutClearCodeInfo() {
