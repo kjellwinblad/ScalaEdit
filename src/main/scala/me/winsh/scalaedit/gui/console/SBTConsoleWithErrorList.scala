@@ -212,8 +212,7 @@ class SBTConsoleWithErrorList extends ConsolePanel {
 
     //See if it matches something biginning, error, warning, end
     if (in == 10) {
-			println(toMatchOn.toString)
-      println(toMatchOn.toString.map(_.toInt)mkString(","))
+
       toMatchOn.toString match {
         case beginning(s) => {
           EditorsPanel().notifyAboutClearCodeInfo()

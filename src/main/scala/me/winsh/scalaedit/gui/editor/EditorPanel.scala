@@ -126,7 +126,12 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   //load the content into the editor 
   try {
+
+  	val car = editorPane.getCaret().asInstanceOf[DefaultCaret]
+    val policy = car.getUpdatePolicy()
+    car.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
     editorPane.setText(fileBuffer.content)
+    car.setUpdatePolicy(policy)
   } catch {
     case _ => {
       Dialog.showMessage(message = "This may not be a text file.", title = "Could Not Read File")

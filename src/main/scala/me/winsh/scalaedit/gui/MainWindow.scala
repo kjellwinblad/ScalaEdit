@@ -15,7 +15,7 @@ import java.net.URI
 
 class MainWindow extends Frame {
 
-  val version = "0.1.2"
+  val version = "0.1.4"
  
   title = "ScalaEdit (" + version + ")"
 
@@ -165,11 +165,15 @@ class MainWindow extends Frame {
 				contents += new MenuItem(Action("ScalaEdit"){
 					EditorsPanel().addLicenseView("ScalaEdit License", "/licenses/scala_edit_license")
 				})
+				contents += new Separator()
 				contents += new MenuItem(Action("RSyntaxTextArea"){
 					EditorsPanel().addLicenseView("RSyntaxTextArea License", "/licenses/rsyntaxtextarea_license")
 				})
 				contents += new MenuItem(Action("Scala"){
 					EditorsPanel().addLicenseView("Scala License", "/licenses/scala_licence")
+				})
+				contents += new MenuItem(Action("sbt (Simple Build Tool)"){
+					EditorsPanel().addLicenseView("sbt License", "/licenses/sbt_license")
 				})
 				contents += new MenuItem(Action("JLine"){
 					EditorsPanel().addLicenseView("JLine License", "/licenses/jline_license")
