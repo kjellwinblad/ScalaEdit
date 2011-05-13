@@ -16,7 +16,7 @@ Requirements: [sbt](http://code.google.com/p/simple-build-tool/), Java SDK 1.6 a
 
 In a system console:
 
-* git clone git@github.com:kjellwinblad/ScalaEdit.git
+* git clone git://github.com/kjellwinblad/ScalaEdit.git
 * cd ScalaEdit
 * sbt run
 * sbt assembly (to create executable jar-file)
