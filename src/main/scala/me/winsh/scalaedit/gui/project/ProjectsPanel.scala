@@ -19,6 +19,10 @@ class ProjectsPanel(val fileSelectionHandler: (File) => Unit) extends BorderPane
 		projectPanel.changeRootAction()
 	}
 
+	def changeRoot(root:File) {
+		projectPanel.changeRoot(root)
+	}
+
 	preferredSize = new Dimension(200,700)
 
 }

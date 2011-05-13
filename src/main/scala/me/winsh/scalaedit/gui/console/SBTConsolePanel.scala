@@ -24,6 +24,7 @@ import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import scala.util.matching.Regex
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 
 class SBTConsolePanel extends VT320ConsoleBase {
 
@@ -70,13 +71,23 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
 				val classPath = System.getProperty("java.class.path")
 
-				val pb = if(System.getProperty("os.name").toLowerCase.contains("windows")){
+				if(System.getProperty("os.name").toLowerCase.contains("windows"))
 					echoInput = true
-        	new ProcessBuilder(javaPath, "-Djline.terminal=jline.UnsupportedTerminal", "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot")
-				}else
-        	new ProcessBuilder(javaPath, "-cp", sbtJarFile.getAbsolutePath, "xsbt.boot.Boot")
 
-        pb.directory(Utils.projectDir)
+				val sbtProperties = new SBTConsolePanelProperties()
+
+				val args:java.util.List[String] = 
+					javaPath::
+					sbtProperties.javaVMArguments.split(" ").toList::: 
+					"-cp":: 
+					sbtJarFile.getAbsolutePath:: 
+					"xsbt.boot.Boot"::
+					(if(sbtProperties.arguments.size==0) List[String]()
+					 else sbtProperties.arguments.split(" ").toList):::Nil
+				
+				val pb = new ProcessBuilder(args)
+
+        pb.directory(sbtProperties.startingDir)
 
         pb.start()
 

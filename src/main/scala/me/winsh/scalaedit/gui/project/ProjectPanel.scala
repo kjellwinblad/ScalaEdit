@@ -12,6 +12,8 @@ import javax.swing.event._
 import javax.swing.event.{TreeExpansionEvent => JTreeExpansionEvent}
 import javax.swing.tree.{MutableTreeNode, TreeNode, DefaultTreeModel, TreePath, TreeModel => JTreeModel}
 import java.util.concurrent.atomic.AtomicBoolean 
+import scala.io.Source
+import java.io.FileWriter
 
 class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel {
 
@@ -219,15 +221,37 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     chooser.showDialog(this, "Select")
 
     if (chooser.selectedFile != null) {
-
-      tree = new ProjectTree(chooser.selectedFile)
-
-      Utils.projectDir = chooser.selectedFile
-      Utils.bestFileChooserDir = chooser.selectedFile
-      
-      scrollPane.contents = tree
+      changeRoot(chooser.selectedFile)
     }
   }
+
+  def changeRoot(root:File) {
+
+    tree = new ProjectTree(root)
+
+    Utils.projectDir = root
+    Utils.bestFileChooserDir = root
+      
+    scrollPane.contents = tree
+
+		val recentProjectRootsStore = new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs")
+
+    val recentPaths = try{
+    	val source = Source.fromFile(recentProjectRootsStore)
+    	(root.getCanonicalPath::source.getLines().toList).distinct.take(6)
+    }catch{
+    	case _ => List(root.getCanonicalPath)
+    }
+
+		val writer = new FileWriter(recentProjectRootsStore)
+
+		recentPaths.foreach((path)=>writer.write(path+"\n"))
+
+    writer.close()
+
+  }
+
+  changeRoot(Utils.projectDir)
   
   def refreshAction() {
   	val selection = tree.peer.getSelectionPath

@@ -7,10 +7,14 @@ import java.awt.Toolkit
 import java.awt.Point
 import java.awt.SplashScreen
 import java.awt.event._
+import java.io.File
 /**   
  * @author Kjell Winblad
  */
 object Main extends SimpleSwingApplication {
+
+	//Initialize properties dir
+	Utils.propertiesDir.mkdir()
 
 	private val splash = SplashScreen.getSplashScreen()
   if (splash != null) {
@@ -26,9 +30,6 @@ object Main extends SimpleSwingApplication {
 	}
 
   def top = {
-    
-    //window.size = new Dimension(800,800)
-    //window.preferredSize = new Dimension(800,800)
     
     window.maximize()
 

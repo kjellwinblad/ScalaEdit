@@ -32,7 +32,7 @@ import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import scala.util.matching.Regex
 import scala.annotation.tailrec
-
+import scala.collection.JavaConversions._
 
 class StandAloneScalaConsolePanel extends VT320ConsoleBase {
   val consoleType = StandAloneScalaConsole
@@ -52,12 +52,26 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 				
 				val classPath = System.getProperty("java.class.path")
 				
-				val pb = if(System.getProperty("os.name").toLowerCase.contains("windows")){
+				if(System.getProperty("os.name").toLowerCase.contains("windows"))
 					echoInput = true
-        	new ProcessBuilder(javaPath, "-Djline.terminal=NONE","-cp", classPath, "scala.tools.nsc.MainInterpreter", "-usejavacp")
-				}else
-        	new ProcessBuilder(javaPath,"-cp", classPath, "scala.tools.nsc.MainInterpreter", "-usejavacp")
 
+				
+				val scalaProperties = new StandAloneScalaConsolePanelProperties()
+
+				val args:java.util.List[String] = 
+					javaPath::
+					scalaProperties.javaVMArguments.split(" ").toList::: 
+					"-cp":: 
+					(classPath + 
+						(if(scalaProperties.javaClasspath=="")"" else":" +scalaProperties.javaClasspath)):: 
+					"scala.tools.nsc.MainGenericRunner"::
+					"-usejavacp"::
+					(if(scalaProperties.arguments.size==0)List[String]()
+					 else scalaProperties.arguments.split(" ").toList):::Nil
+
+				val pb =
+        	new ProcessBuilder(args)
+				
         pb.directory(Utils.projectDir)
 
         pb.start()

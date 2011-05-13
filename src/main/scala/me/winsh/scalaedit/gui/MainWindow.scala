@@ -12,10 +12,14 @@ import me.winsh.scalaedit.gui.project._
 import me.winsh.scalaedit.gui.console._
 import java.awt.Desktop
 import java.net.URI
+import scala.swing.event._
+import scala.io.Source
+import javax.swing.event.MenuListener
+import javax.swing.event.MenuEvent
 
 class MainWindow extends Frame {
 
-  val version = "0.1.4"
+  val version = "0.1.6"
  
   title = "ScalaEdit (" + version + ")"
 
@@ -35,6 +39,8 @@ class MainWindow extends Frame {
 	maximize()
   
   menuBar = new MenuBar() {
+
+		
 
     val fileMenu = new Menu("File") {
 
@@ -83,15 +89,48 @@ class MainWindow extends Frame {
     }
 
     val projectMenu = new Menu("Project") {
-      contents += new MenuItem(new Action("Change Project Root...") {
 
-        icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
 
-        def apply() {
-          projectsPanel.changeRootAction()
-        }
+			peer.addMenuListener(new MenuListener(){
+					def menuCanceled(e:MenuEvent) {}
+					def menuDeselected(e:MenuEvent) {}
+					def menuSelected(e:MenuEvent) {
+						prepareMenu()
+					}
+			})
 
-      })
+			def prepareMenu(){
+	      contents.clear()
+			  contents += new MenuItem(new Action("Change Project Root...") {
+		
+		    icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
+		
+			    def apply() {
+			      projectsPanel.changeRootAction()
+			    }
+		
+		   	})
+
+				val recentPathItems = try{
+			   	val src = Source.fromFile(new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs"))
+
+					contents += new Separator()
+					
+			   	src.getLines().foreach((path)=>{
+			   		contents += new MenuItem(Action(path){
+			   			projectsPanel.changeRoot(new File(path))
+			   		})
+			   	})
+
+			   	src.close()
+				}catch{
+					case _ => 
+				}
+
+		    //revalidate()
+			}
+    	
+
     }
 
     val terminalMenu = new Menu("Terminal") {
@@ -114,14 +153,15 @@ class MainWindow extends Frame {
         }
 
       })
-/*
+
       contents += new Menu("Properties"){
 	      contents += new MenuItem(new Action("SBT Terminal Properties...") {
 	
 	        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
 	
 	        def apply() {
-	          consolesPanel.addSBTTerminal()
+	        	val props = new SBTConsolePanelProperties()
+	          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
 	        }
 	
 	      })
@@ -130,11 +170,12 @@ class MainWindow extends Frame {
 	        icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
 	
 	        def apply() {
-	          consolesPanel.addScalaTerminal()
+	        	val props = new StandAloneScalaConsolePanelProperties()
+	          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
 	        }
 	
 	      })
-      }*/
+      }
     }
 
     val helpMenu = new Menu("Help") {
