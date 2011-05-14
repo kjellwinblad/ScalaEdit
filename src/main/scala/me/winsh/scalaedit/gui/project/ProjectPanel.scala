@@ -194,7 +194,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
       	def apply() = refreshAction()
     	}))
     	add(new CheckMenuItem (""){
-    		selected = true
+    		selected = false
     		action = new Action("Auto Refresh ("+autorefreshIntervallSeconds+" sec)") {
     			icon = Utils.getIcon("/images/small-icons/find.png")
     			def apply(){
@@ -283,7 +283,5 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
   def stopAutoRefresh() {
     autoRefreshRunning.set(false)
   }
-
-  startAutoRefresh()
 
 }

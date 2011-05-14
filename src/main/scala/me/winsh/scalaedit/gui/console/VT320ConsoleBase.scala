@@ -148,10 +148,9 @@ trait VT320ConsoleBase extends ConsolePanel {
 					accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK))
 					toolTip = "<html>Send to to terminal <i>(control+ENTER)</i>"
 					def apply(){
-						inOutSource.output.write((inputArea.text.replaceAll("\t","  ") + "\n").map(_.toByte).toArray)
+						emulation.write((inputArea.text.replaceAll("\t","  ") + "\n").map(_.toByte).toArray)
 						inputArea.text = ""
 						inputArea.requestFocus()
-						
 					}
 				}
 			
