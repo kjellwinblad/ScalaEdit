@@ -1,3 +1,13 @@
+/*
+ScalaEdit - A text editor for Scala programmers
+Copyright (C) 2011  Kjell Winblad (kjellwinblad@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 package me.winsh.scalaedit.gui.project
 
 import java.io.File
@@ -23,6 +33,23 @@ class ProjectsPanel(val fileSelectionHandler: (File) => Unit) extends BorderPane
 		projectPanel.changeRoot(root)
 	}
 
-	preferredSize = new Dimension(200,700)
+	def selectFile(file:File){
+		projectPanel.selectFile(file)
+	}
 
+}
+
+object ProjectsPanel{
+
+	var projectsPanel:ProjectsPanel = null
+
+	def apply(fileSelectionHandler: (File) => Unit) ={
+		
+		projectsPanel = new ProjectsPanel(fileSelectionHandler)
+		
+		projectsPanel
+
+	}
+
+	def apply() = projectsPanel
 }

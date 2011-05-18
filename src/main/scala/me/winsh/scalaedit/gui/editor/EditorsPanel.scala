@@ -1,10 +1,22 @@
+/*
+ScalaEdit - A text editor for Scala programmers
+Copyright (C) 2011  Kjell Winblad (kjellwinblad@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 package me.winsh.scalaedit.gui.editor
 
 import scala.swing._
+import scala.swing.event._
 import me.winsh.scalaedit.api.FileBuffer
 import me.winsh.scalaedit.api.CodeNotification
 import me.winsh.scalaedit.api.Closeable
 import me.winsh.scalaedit.gui._
+import me.winsh.scalaedit.gui.project._
 import scala.collection.mutable.HashMap
 import java.io.File
 
@@ -48,7 +60,7 @@ abstract class EditorsPanel extends TabbedPane {
 
     val editorPanel = openExistingBuffer(buffer).getOrElse {
 
-      val tabComponent = new ButtonTabComponentImpl(this, () => bufferToEditorMap -= buffer);
+      val tabComponent = new EditorButtonTabComponent(buffer,this, () => bufferToEditorMap -= buffer);
 
       val newEditorPanel = new EditorPanel(buffer, tabComponent)
 
@@ -82,6 +94,49 @@ abstract class EditorsPanel extends TabbedPane {
 
       peer.setSelectedComponent(newEditorPanel.peer)
 
+  }
+
+  listenTo(mouse.clicks)
+
+	def currentEditorPanel = pages.find(_.content.peer == peer.getSelectedComponent()) match{
+		case Some(page) if (page.content.isInstanceOf[EditorPanel]) => 
+			Some(page.content.asInstanceOf[EditorPanel])
+		case _ => None
+	}
+
+	def editorPanelSelected = currentEditorPanel match {
+		case Some(_) => true
+		case _ => false
+	}
+	
+	
+	def openSelectedInProjectBrowser(){
+		currentEditorPanel.foreach(_.fileBuffer.file.foreach(ProjectsPanel().selectFile(_)))
+	}
+
+  reactions += {
+  	case MousePressed(_, point, _, _, triggersPopup) 
+  			if(triggersPopup && editorPanelSelected) => {
+	  	val editorPanel = currentEditorPanel.get
+	  	//Display popup
+	  	(new PopupMenu() {
+				add(new MenuItem(new Action("Select in Project Browser"){
+					icon = Utils.getIcon("/images/small-icons/go-up.png")
+					def apply = openSelectedInProjectBrowser()
+		  	}))
+		  	editorPanel.fileBuffer.file.foreach((file)=>{
+		  		def nicifyPath(p:String) =
+		  			if(p.size <= 50) p
+		  			else "..." + p.takeRight(47)
+		  		addSeparator()
+		  		add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())){
+						tooltip = file.getCanonicalPath()
+						icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+						def apply = Utils.clipboardContents = file.getCanonicalPath()
+		  		}))
+		  	})
+		  }).peer.show(this.peer, point.x, point.y)
+  	}
   }
 
   private var currentNotifications: List[CodeNotification] = Nil

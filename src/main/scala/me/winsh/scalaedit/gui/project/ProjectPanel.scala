@@ -1,3 +1,13 @@
+/*
+ScalaEdit - A text editor for Scala programmers
+Copyright (C) 2011  Kjell Winblad (kjellwinblad@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 package me.winsh.scalaedit.gui.project
 
 import java.io.File
@@ -25,9 +35,9 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
   add(scrollPane, BorderPanel.Position.Center)
 
-  class ProjectTree(val projectRoot:File) extends Tree[File] {
+  class ProjectTree(projectRoot:File) extends Tree[File] {
 
-    val root = projectRoot
+    val root = projectRoot.getCanonicalFile
 
     private def filteredSortedChilds(f: File) = f.listFiles.toList.filter((f) => (!f.getName.startsWith(".")))
     .sortWith((e1, e2) =>(e1, e2) match{
@@ -58,19 +68,23 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     listenTo(mouse.clicks)
 
     reactions += {
-      case MousePressed (_, point, _, _, _) => {
+			case MousePressed (_, point, _, _, triggersPopup) => {
         val path = peer.getClosestPathForLocation(point.x, point.y)
         if(peer.getPathBounds(path).contains(point)){
         	tree.peer.setSelectionPath(path)
-        	val file = path.getLastPathComponent().asInstanceOf[File]
-	        file match {
-	          case f: File if (!f.isDirectory) => {
-	        	  fileSelectionHandler(f)
-	        	  Utils.bestFileChooserDir = f.getParentFile
-	          }
-	          case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
-	          case _ => Unit
-	        }        	
+        	if(triggersPopup){
+	        	popupMenu.show(peer, point.x, point.y)
+	        }else{
+	        	val file = path.getLastPathComponent().asInstanceOf[File]
+		        file match {
+		          case f: File if (!f.isDirectory) => {
+		        	  fileSelectionHandler(f)
+		        	  Utils.bestFileChooserDir = f.getParentFile
+		          }
+		          case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
+		          case _ => Unit
+		        }
+	        }
         }
       }
     }
@@ -103,7 +117,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 				val selFile = if(!selection.empty)
       		selectedPath.getLastPathComponent().asInstanceOf[File]
       	else
-      		projectRoot
+      		root
 
       	if(selFile.isDirectory) selFile else selFile.getParentFile
 			}
@@ -207,7 +221,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     	})
     }).peer
     
-    this.peer.setComponentPopupMenu(popupMenu)
+    //this.peer.setComponentPopupMenu(popupMenu)
 
   }
 
@@ -283,5 +297,29 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
   def stopAutoRefresh() {
     autoRefreshRunning.set(false)
   }
+  
+	def selectFile(file:File){
 
+		//Get the shortest common root of the file and the root
+		val conFile = file.getCanonicalFile()
+
+
+		def filePartsAboveRoot(root:File, file:File):List[AnyRef] ={
+			if(root.getPath == file.getPath){
+				root::tree.peer.getClosestPathForLocation(0, 0).getPath()(0)::Nil
+			}else if(root.getPath.size >= file.getPath.size){
+				//Display error message
+				Dialog.showMessage (
+					message = "The file could not be found in the project directory.", 
+					title = "File Not Found")
+				Nil
+			}else{
+				file::filePartsAboveRoot(root, file.getParentFile)
+			}
+		}
+
+		val path = new TreePath(filePartsAboveRoot(tree.root, conFile).reverse.toArray)
+
+		tree.peer.setSelectionPath(path)
+	}
 }

@@ -1,3 +1,13 @@
+/*
+ScalaEdit - A text editor for Scala programmers
+Copyright (C) 2011  Kjell Winblad (kjellwinblad@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 package me.winsh.scalaedit.gui
 
 import me.winsh.scalaedit.api._
@@ -29,7 +39,7 @@ class MainWindow extends Frame {
 
   val editorsPanel = EditorsPanel()
 
-  val projectsPanel = new ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
+  val projectsPanel = ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
   def shutDownOpenResources(){
 	  editorsPanel.shutDownAllOpenResources()
