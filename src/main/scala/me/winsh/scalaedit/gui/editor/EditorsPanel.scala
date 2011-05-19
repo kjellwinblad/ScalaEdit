@@ -26,10 +26,16 @@ abstract class EditorsPanel extends TabbedPane {
 
   tabLayoutPolicy = TabbedPane.Layout.Scroll
 
-  def shutDownAllOpenResources() {
-    pages.foreach((page) => {
-      page.content.asInstanceOf[Closeable].close()
-    })
+  def shutDownAllOpenResources(keepCurrentOpen:Boolean = false) = {
+  	val pagesToClose = 
+  		if(keepCurrentOpen) pages.filter(_.content.peer != peer.getSelectedComponent())
+  		else pages
+  		
+    val toClose = pagesToClose.filter(_.content.asInstanceOf[Closeable].close())
+
+    toClose.foreach(pages -= _)
+
+    pages.size == 0
   }
 
   def isBufferInPanel(buffer: FileBuffer) = pages.exists((e) => {
@@ -60,7 +66,7 @@ abstract class EditorsPanel extends TabbedPane {
 
     val editorPanel = openExistingBuffer(buffer).getOrElse {
 
-      val tabComponent = new EditorButtonTabComponent(buffer,this, () => bufferToEditorMap -= buffer);
+      val tabComponent = new ButtonTabComponentImpl(this, () => bufferToEditorMap -= buffer);
 
       val newEditorPanel = new EditorPanel(buffer, tabComponent)
 
@@ -76,7 +82,8 @@ abstract class EditorsPanel extends TabbedPane {
 
     }
 
-    //Perform notify about code info with current code notifications to make sure they are shown in the editor
+    //Perform notify about code info with current code notifications
+    //to make sure they are shown in the editor
     notifyAboutCodeInfo(currentNotifications)
 
     editorPanel
@@ -135,6 +142,15 @@ abstract class EditorsPanel extends TabbedPane {
 						def apply = Utils.clipboardContents = file.getCanonicalPath()
 		  		}))
 		  	})
+		  	addSeparator()
+		  	add(new MenuItem(new Action("Close All"){
+					icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+					def apply = shutDownAllOpenResources()
+		  	}))
+		  	add(new MenuItem(new Action("Close All Except This"){
+					icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+					def apply = shutDownAllOpenResources(true)
+		  	}))
 		  }).peer.show(this.peer, point.x, point.y)
   	}
   }

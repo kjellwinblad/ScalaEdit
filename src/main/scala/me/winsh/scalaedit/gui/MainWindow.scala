@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 package me.winsh.scalaedit.gui
 
+import javax.swing.WindowConstants
 import me.winsh.scalaedit.api._
 import scala.swing._
 import javax.swing.JSplitPane._
@@ -41,16 +42,16 @@ class MainWindow extends Frame {
 
   val projectsPanel = ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
-  def shutDownOpenResources(){
-	  editorsPanel.shutDownAllOpenResources()
-	  consolesPanel.shutDownAllOpenResources()
-  }
+	peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
 
-	maximize()
+  def shutDownOpenResources() = 
+	  if(editorsPanel.shutDownAllOpenResources()){
+	  	consolesPanel.shutDownAllOpenResources()
+	  	true
+	  }else false
+
   
   menuBar = new MenuBar() {
-
-		
 
     val fileMenu = new Menu("File") {
 
@@ -290,19 +291,18 @@ class MainWindow extends Frame {
   }
   mainSplitPane.oneTouchExpandable = true
 
-	preferredSize = new Dimension(800,800)
+	preferredSize = new Dimension(800,700)
 
-	size = new Dimension(800,800)
+	size = new Dimension(800,700)
 	
   contents = mainSplitPane
 
-	mainSplitPane.dividerLocation = 577
+	mainSplitPane.dividerLocation = 477
 
 	mainSplitPane.editorProjectSplitPane.dividerLocation = 200
-
-	maximized()
-	maximize()
 	
 	pack()
+
+	maximize()
 
 }

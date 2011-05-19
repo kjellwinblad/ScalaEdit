@@ -18,10 +18,8 @@ import java.awt.Point
 import java.awt.SplashScreen
 import java.awt.event._
 import java.io.File
-/**   
- * @author Kjell Winblad
- */
-object Main extends SimpleSwingApplication {
+
+object Main {
 
 	//Initialize properties dir
 	Utils.propertiesDir.mkdir()
@@ -33,26 +31,20 @@ object Main extends SimpleSwingApplication {
   }
 
 	val window = new MainWindow(){
-		override def closeOperation {
+		override def closeOperation:Unit = if(shutDownOpenResources()){
+			visible = false
 			dispose() 
-			quit()
+			sys.exit()
 		}
 	}
 
-  def top = {
-    
-    window.maximize()
+  def main(args:Array[String]) = {
 
 		if(splash != null)
 			splash.close()
 			
-    window
+    window.visible = true
     
-  }
-   
-  
-  override def shutdown() {
-	 window.shutDownOpenResources() 
   }
 
 }
