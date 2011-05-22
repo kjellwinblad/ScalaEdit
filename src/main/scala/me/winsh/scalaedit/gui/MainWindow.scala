@@ -10,6 +10,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 package me.winsh.scalaedit.gui
 
+import java.awt.event.KeyEvent
+import java.awt.event.InputEvent
+import javax.swing.KeyStroke
 import javax.swing.WindowConstants
 import me.winsh.scalaedit.api._
 import scala.swing._
@@ -55,7 +58,11 @@ class MainWindow extends Frame {
 
     val fileMenu = new Menu("File") {
 
+    	mnemonic = Key.F
+
       contents += new MenuItem(new Action("New") {
+
+				accelerator = Some(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK))
 
         icon = Utils.getIcon("/images/small-icons/actions/filenew.png")
 
@@ -66,6 +73,8 @@ class MainWindow extends Frame {
       })
 
       contents += new MenuItem(new Action("Open...") {
+
+				accelerator = Some(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK))
 
         icon = Utils.getIcon("/images/small-icons/actions/fileopen.png")
 
@@ -101,6 +110,7 @@ class MainWindow extends Frame {
 
     val projectMenu = new Menu("Project") {
 
+			mnemonic = Key.P
 
 			peer.addMenuListener(new MenuListener(){
 					def menuCanceled(e:MenuEvent) {}
@@ -145,6 +155,9 @@ class MainWindow extends Frame {
     }
 
     val terminalMenu = new Menu("Terminal") {
+
+			mnemonic = Key.T
+    	
       contents += new MenuItem(new Action("New Scala Terminal") {
 
         icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
@@ -190,7 +203,9 @@ class MainWindow extends Frame {
     }
 
     val helpMenu = new Menu("Help") {
-  
+
+			mnemonic = Key.H
+  		
       contents += new MenuItem(Action("About") {
 
         val text =

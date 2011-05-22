@@ -29,6 +29,7 @@ import scala.swing.Action
 import me.winsh.scalaedit.gui._
 import javax.swing.text.BadLocationException
 import scala.util.matching._
+import javax.swing.KeyStroke
 
 class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
@@ -158,7 +159,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   //Listen for save action etc
   object saveAction extends Action("Save") {
     icon = saveIcon
-    toolTip = "Save (control+s)"
+    toolTip = "<html>Save <i>(control+s)</i>"
     def apply() {
       fileBuffer.file match {
         case Some(_) => {
@@ -228,7 +229,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   object redoAction extends Action("Redo") {
 
     toolTip = "<html>Redo <i>(control+y)</i>"
-
+		
     icon = Utils.getIcon("/images/small-icons/redo.png")
 
     def apply() {
@@ -236,9 +237,11 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     }
   }
 
-  object cutAction extends Action("<html>Cut <i>(control+x)</i>") {
+  object cutAction extends Action("Cut") {
 
     toolTip = name
+
+		accelerator = Some(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK))
 
     icon = Utils.getIcon("/images/small-icons/cut-to-clipboard.png")
 
@@ -246,18 +249,22 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   }
 
-  object copyAction extends Action("<html>Copy <i>(control+c)</i>") {
+  object copyAction extends Action("Copy") {
 
     toolTip = name
+
+    accelerator = Some(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK))
 
     icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
 
     def apply() = editorPane.copy()
   }
 
-  object pasteAction extends Action("<html>Paste <i>(control+v)</i>") {
+  object pasteAction extends Action("Paste") {
 
     toolTip = name
+
+    accelerator = Some(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK))
 
     icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
 
@@ -265,9 +272,11 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   }
 
-  object selectAllAction extends Action("<html>Select All <i>(control+a)</i>") {
+  object selectAllAction extends Action("Select All") {
 
     toolTip = name
+
+    accelerator = Some(KeyStroke.getKeyStroke('A', InputEvent.CTRL_DOWN_MASK))
 
     icon = Utils.getIcon("/images/small-icons/select-all.png")
 
@@ -291,7 +300,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   object searchAction extends Action("") {
 
-    toolTip = "Search or Search and Replace <i>(control+f)</i>"
+    toolTip = "<html>Search or Search and Replace <i>(control+f)</i>"
 
     icon = Utils.getIcon("/images/small-icons/find.png")
 
@@ -329,7 +338,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
             if (!resultIterator.hasNext) {
               initResultIterator()
-              infoLabel.text = "End reached!"
+              infoLabel.text = """<html><font color="RED"><b>End reached!</b></font>"""
             } else {
               editorPane.select(resultIterator.start + selectionChangeDueToReplacement,
                 resultIterator.end + selectionChangeDueToReplacement)
@@ -340,7 +349,6 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
         }
 
         private val close = new Action("Close") {
-
           mnemonic = KeyEvent.VK_O
           def apply() {
 
@@ -439,7 +447,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   object gotoLineAction extends Action("") {
 
-    toolTip = "Goto Line <i>(control+l)</i>"
+    toolTip = "<html>Goto Line <i>(control+l)</i>"
 
     var wrapLines = false
 
