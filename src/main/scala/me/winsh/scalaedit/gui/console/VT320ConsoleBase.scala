@@ -31,7 +31,7 @@ import java.awt.event.FocusEvent
 
 trait VT320ConsoleBase extends ConsolePanel {
 
-	var echoInput = false
+  var echoInput = false
 
   trait InOutSource {
     def input: InputStream
@@ -50,12 +50,12 @@ trait VT320ConsoleBase extends ConsolePanel {
 
   private val emulation: vt320 = new vt320(80, linesInEmulator) {
     def write(b: Array[Byte]) {
-    	if(echoInput){
-    		//Replace the byte 10 or 13 with 10,13
-    		val echoString = b.map((i)=>if(i==10 || i == 13) Array(10.toChar,13.toChar, ' ') else Array(i.toChar)).flatten.mkString("")
-    		putString(echoString)
-    	}
-    	//Thread.sleep(1000)
+      if (echoInput) {
+        //Replace the byte 10 or 13 with 10,13
+        val echoString = b.map((i) => if (i == 10 || i == 13) Array(10.toChar, 13.toChar, ' ') else Array(i.toChar)).flatten.mkString("")
+        putString(echoString)
+      }
+      //Thread.sleep(1000)
       inOutSource.output.write(b)
     }
     setLocalEcho(false)
@@ -82,35 +82,35 @@ trait VT320ConsoleBase extends ConsolePanel {
 
       icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
 
-      def apply() = inOutSource.output.write(Utils.clipboardContents.replaceAll("\t","  ").map(_.toByte).toArray)
+      def apply() = inOutSource.output.write(Utils.clipboardContents.replaceAll("\t", "  ").map(_.toByte).toArray)
 
     }))
 
-		addSeparator()
+    addSeparator()
 
-		val standardInput = new RadioMenuItem(""){
-			action = new Action("Standard Input Method"){
-				def apply (){
-					setToStandardInput()
-				}
-			}
-		}
+    val standardInput = new RadioMenuItem("") {
+      action = new Action("Standard Input Method") {
+        def apply() {
+          setToStandardInput()
+        }
+      }
+    }
 
-		val multilineInput = new RadioMenuItem(""){
-			action = new Action("Multiline Input Method"){
-				def apply (){
-					setToMultilineInput()
-				}
-			}
-		}
+    val multilineInput = new RadioMenuItem("") {
+      action = new Action("Multiline Input Method") {
+        def apply() {
+          setToMultilineInput()
+        }
+      }
+    }
 
-		val inputMethodSelect = new ButtonGroup(standardInput, multilineInput)
+    val inputMethodSelect = new ButtonGroup(standardInput, multilineInput)
 
-		inputMethodSelect.select(standardInput)
-    
+    inputMethodSelect.select(standardInput)
+
     add(standardInput)
     add(multilineInput)
-    
+
   }).peer
 
   terminal.addMouseListener(new MouseAdapter() {
@@ -123,77 +123,73 @@ trait VT320ConsoleBase extends ConsolePanel {
     }
   })
 
-
   val scrollPane = new ScrollPane(Component.wrap(new JPanel() {
     setLayout(new BorderLayout())
     add(terminal, BorderLayout.CENTER)
   })) {
     horizontalScrollBarPolicy = ScrollPane.BarPolicy.Never
-    preferredSize = new Dimension(450,700)
+    preferredSize = new Dimension(450, 700)
   }
 
-	def setToStandardInput(){
-		add(scrollPane, BorderPanel.Position.Center)
-		revalidate()
-	}
+  def setToStandardInput() {
+    add(scrollPane, BorderPanel.Position.Center)
+    revalidate()
+  }
 
-	
+  def setToMultilineInput() {
 
-	def setToMultilineInput(){
+    val inputPanel = new BorderPanel {
 
-		val inputPanel = new BorderPanel{
+      val inputArea: TextArea = new TextArea() {
+        peer.addFocusListener(new FocusListener() {
+          def focusGained(e: FocusEvent) {
+            peer.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), enterAction.peer)
+          }
 
-			val inputArea:TextArea = new TextArea(){
-				peer.addFocusListener(new FocusListener() {
-    			def focusGained(e: FocusEvent) {
-      			peer.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), enterAction.peer)
-    			}
+          def focusLost(e: FocusEvent) {}
+        })
+      }
 
-    			def focusLost(e: FocusEvent) {}
-  			})
-			}
+      val enterAction = new Action("Enter") {
+        mnemonic = KeyEvent.VK_E
+        accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK))
+        toolTip = "<html>Send to to terminal <i>(control+ENTER)</i>"
+        def apply() {
+          emulation.write((inputArea.text.replaceAll("\t", "  ") + "\n").map(_.toByte).toArray)
+          inputArea.text = ""
+          inputArea.requestFocus()
+        }
+      }
 
-			val enterAction = new Action("Enter"){
-					mnemonic = KeyEvent.VK_E
-					accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK))
-					toolTip = "<html>Send to to terminal <i>(control+ENTER)</i>"
-					def apply(){
-						emulation.write((inputArea.text.replaceAll("\t","  ") + "\n").map(_.toByte).toArray)
-						inputArea.text = ""
-						inputArea.requestFocus()
-					}
-				}
-			
-			add(new ScrollPane(inputArea),BorderPanel.Position.Center)
+      add(new ScrollPane(inputArea), BorderPanel.Position.Center)
 
-			add(new Button(){
-				action = enterAction
-				//preferredSize = new Dimension(450,20)
-			},BorderPanel.Position.East)
-		}
-		val splitPane = new SplitPane(Orientation.Horizontal, left=scrollPane, right=inputPanel)
-		
-		splitPane.resizeWeight = 1.0
+      add(new Button() {
+        action = enterAction
+        //preferredSize = new Dimension(450,20)
+      }, BorderPanel.Position.East)
+    }
+    val splitPane = new SplitPane(Orientation.Horizontal, left = scrollPane, right = inputPanel)
 
-		splitPane.preferredSize = new Dimension(300,300)
+    splitPane.resizeWeight = 1.0
 
-		splitPane.dividerLocation = 0.9
-		
-		add(splitPane, BorderPanel.Position.Center)
-		
-		revalidate()
+    splitPane.preferredSize = new Dimension(300, 300)
 
-		scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+    splitPane.dividerLocation = 0.9
 
-		inputPanel.requestFocus()
-		
-	}
+    add(splitPane, BorderPanel.Position.Center)
 
-	if(System.getProperty("os.name").toLowerCase.contains("windows"))
-		setToMultilineInput()
-	else
-		setToStandardInput()
-  
+    revalidate()
+
+    scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+
+    inputPanel.requestFocus()
+
+  }
+
+  if (System.getProperty("os.name").toLowerCase.contains("windows"))
+    setToMultilineInput()
+  else
+    setToStandardInput()
 
   private var running = false
 
@@ -207,7 +203,7 @@ trait VT320ConsoleBase extends ConsolePanel {
 
         val b = inOutSource.input.read();
 
-			  Utils.swingInvokeLater(() => invokeOnConsoleOutput.foreach(func => func(b)))
+        Utils.swingInvokeLater(() => invokeOnConsoleOutput.foreach(func => func(b)))
         //scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
         b match {
           case -1 => running = false
@@ -256,33 +252,33 @@ trait VT320ConsoleBase extends ConsolePanel {
    * @param str
    */
   def putLine(str: String) {
-  	putString(str + 10.toChar + 13.toChar) 
+    putString(str + 10.toChar + 13.toChar)
   }
 
-	putLine(" Loading...")
-
-  for (_ <- 0 to (linesInEmulator + 100)) { putLine("") }
-  
   putLine(" Loading...")
 
-	putLine("")
+  for (_ <- 0 to (linesInEmulator + 100)) { putLine("") }
 
-	if(System.getProperty("os.name").toLowerCase.contains("windows")){
-		putLine("OBS! Direct input to the terminal is known to work badly in Windows.")
-		putLine("Windows users are therefore recommended to use the multiline input method.")
-		putLine("This is because of a problem with JLine which is used in Scala and sbt.")
-	}
+  putLine(" Loading...")
 
-	putLine("")
-  
+  putLine("")
+
+  if (System.getProperty("os.name").toLowerCase.contains("windows")) {
+    putLine("OBS! Direct input to the terminal is known to work badly in Windows.")
+    putLine("Windows users are therefore recommended to use the multiline input method.")
+    putLine("This is because of a problem with JLine which is used in Scala and sbt.")
+  }
+
+  putLine("")
+
   putString(" ")
 
   //Disable arrow keys in scroll pane
 
   def disableArrowKeys(im: InputMap) {
-	  
+
     List(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT).foreach(keyStrokName => {
-      im.put(KeyStroke.getKeyStroke(keyStrokName,0), "none");
+      im.put(KeyStroke.getKeyStroke(keyStrokName, 0), "none");
     })
 
   }

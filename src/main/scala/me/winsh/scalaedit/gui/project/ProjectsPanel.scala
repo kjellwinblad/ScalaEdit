@@ -21,35 +21,35 @@ import me.winsh.scalaedit.gui._
 
 class ProjectsPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel {
 
-	var projectPanel = new ProjectPanel(fileSelectionHandler)
+  var projectPanel = new ProjectPanel(fileSelectionHandler)
 
-	add(projectPanel, BorderPanel.Position.Center)
+  add(projectPanel, BorderPanel.Position.Center)
 
-	def changeRootAction() {
-		projectPanel.changeRootAction()
-	}
+  def changeRootAction() {
+    projectPanel.changeRootAction()
+  }
 
-	def changeRoot(root:File) {
-		projectPanel.changeRoot(root)
-	}
+  def changeRoot(root: File) {
+    projectPanel.changeRoot(root)
+  }
 
-	def selectFile(file:File){
-		projectPanel.selectFile(file)
-	}
+  def selectFile(file: File) {
+    projectPanel.selectFile(file)
+  }
 
 }
 
-object ProjectsPanel{
+object ProjectsPanel {
 
-	var projectsPanel:ProjectsPanel = null
+  var projectsPanel: ProjectsPanel = null
 
-	def apply(fileSelectionHandler: (File) => Unit) ={
-		
-		projectsPanel = new ProjectsPanel(fileSelectionHandler)
-		
-		projectsPanel
+  def apply(fileSelectionHandler: (File) => Unit) = {
 
-	}
+    projectsPanel = new ProjectsPanel(fileSelectionHandler)
 
-	def apply() = projectsPanel
+    projectsPanel
+
+  }
+
+  def apply() = projectsPanel
 }

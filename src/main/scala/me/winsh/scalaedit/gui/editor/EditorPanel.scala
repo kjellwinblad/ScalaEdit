@@ -138,7 +138,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   //load the content into the editor 
   try {
 
-  	val car = editorPane.getCaret().asInstanceOf[DefaultCaret]
+    val car = editorPane.getCaret().asInstanceOf[DefaultCaret]
     val policy = car.getUpdatePolicy()
     car.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
     editorPane.setText(fileBuffer.content)
@@ -229,7 +229,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   object redoAction extends Action("Redo") {
 
     toolTip = "<html>Redo <i>(control+y)</i>"
-		
+
     icon = Utils.getIcon("/images/small-icons/redo.png")
 
     def apply() {
@@ -241,7 +241,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     toolTip = name
 
-		accelerator = Some(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK))
+    accelerator = Some(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK))
 
     icon = Utils.getIcon("/images/small-icons/cut-to-clipboard.png")
 
@@ -437,7 +437,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
         }
 
-      }, Unit=>{editorPane.setEditable(true)})
+      }, Unit => { editorPane.setEditable(true) })
 
       focusComponent.requestFocus()
       editorPane.setEditable(false)
@@ -459,9 +459,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
       editorAndToolArea.setTool(new FlowPanel(FlowPanel.Alignment.Left)() {
 
         private val gotoLine = new Action("Goto Line") {
-        	
+
           mnemonic = KeyEvent.VK_G
-          
+
           def apply() {
             try {
               val selectedLineNumber: Int = lineNumberField.text.toInt match {

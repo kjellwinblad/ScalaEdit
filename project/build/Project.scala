@@ -3,9 +3,10 @@ import java.io.File
 import scala.io.Source
 import de.element34.sbteclipsify._
 import assembly._
+import com.github.olim7t.sbtscalariform._
 
-class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify  with AssemblyBuilder{
-  lazy val projectScalaVersion = "2.9.0.RC2"
+class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify  with AssemblyBuilder with ScalariformPlugin{
+  lazy val projectScalaVersion = "2.9.0"
   lazy val mainJar = "target/scala_" + projectScalaVersion + "/" +
     projectName.value + "_" + projectScalaVersion + "-" + projectVersion.value + ".jar"
   lazy val dependencyJars = new File("lib").listFiles.filter(_.getName.endsWith(".jar")).map(_.getAbsolutePath)
@@ -77,6 +78,12 @@ class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Ecli
 
       None
     } dependsOn assembly
+
+	// See ScalariformOptions.scala and the Scalariform documentation for the list of options.
+	// NB: InPlace is assumed unless Test is specified
+	override def scalariformOptions = Seq(VerboseScalariform)
+
+	override def formatBeforeCompiling = false
 
   import SignJar._
   /*override*/ def webstartSignConfiguration = Some(new SignConfiguration("scalaedit", storePassword("scalaedit43") :: Nil))

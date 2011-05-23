@@ -35,11 +35,11 @@ abstract class FileBuffer(var file: Option[File]) {
     case Some(f) => {
       var src: Source = null
       try {
-        
-    	src = Source.fromFile(f)
+
+        src = Source.fromFile(f)
         val cont = src.getLines.mkString("\n")
         cont
-        
+
       } finally { src.close() }
     }
   }

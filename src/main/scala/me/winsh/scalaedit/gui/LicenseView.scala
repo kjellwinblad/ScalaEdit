@@ -17,24 +17,24 @@ import java.io.InputStream
 import java.awt.Font
 import javax.swing.text.DefaultCaret
 
-class LicenseView(resourcePath:String) extends ScrollPane with Closeable {
+class LicenseView(resourcePath: String) extends ScrollPane with Closeable {
 
-	contents = new TextArea(){
+  contents = new TextArea() {
 
-		private val car = peer.getCaret().asInstanceOf[DefaultCaret]
-    
+    private val car = peer.getCaret().asInstanceOf[DefaultCaret]
+
     car.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
-		
-		editable = false
-	
-		peer.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12))
-	
-		private val licenseTextStream = this.getClass.getResourceAsStream(resourcePath) 
-		
-		text = Source.fromInputStream(licenseTextStream).getLines().mkString("\n")
-		
-	}
 
-	def close() = true
-	
+    editable = false
+
+    peer.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12))
+
+    private val licenseTextStream = this.getClass.getResourceAsStream(resourcePath)
+
+    text = Source.fromInputStream(licenseTextStream).getLines().mkString("\n")
+
+  }
+
+  def close() = true
+
 }

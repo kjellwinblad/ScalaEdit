@@ -17,12 +17,12 @@ import java.awt.datatransfer._
 import java.io.File
 import scala.swing._
 
-object Utils { 
+object Utils {
 
   var bestFileChooserDir = projectDir
 
   var projectDir = new File(".")
-  
+
   def clipboardContents_=(contentToSet: String) {
     val stringSelection = new StringSelection(contentToSet);
     val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -61,26 +61,26 @@ object Utils {
 
   def swingInvokeAndWait(fun: () => Unit) {
 
-  	if(SwingUtilities.isEventDispatchThread())
-  		fun()
-  	else
-    	SwingUtilities.invokeAndWait(new Runnable {
-      	def run {
-        	fun()
-      	}
-    	})
+    if (SwingUtilities.isEventDispatchThread())
+      fun()
+    else
+      SwingUtilities.invokeAndWait(new Runnable {
+        def run {
+          fun()
+        }
+      })
   }
 
   def swingInvokeLater(fun: () => Unit) {
 
-  	if(SwingUtilities.isEventDispatchThread())
-  		fun()
-  	else
-    	SwingUtilities.invokeLater(new Runnable {
-      	def run {
-        	fun()
-      	}
-    	})
+    if (SwingUtilities.isEventDispatchThread())
+      fun()
+    else
+      SwingUtilities.invokeLater(new Runnable {
+        def run {
+          fun()
+        }
+      })
   }
 
   def runInNewThread(fun: () => Unit) {
@@ -91,12 +91,12 @@ object Utils {
     }).start()
   }
 
-  def iconForFile(file:File) = 
-	  if(file.isDirectory)
-	 	  getIcon("/images/small-icons/mimetypes/folder.png")
-	  else
-	 	  iconFromContentType((FileBuffer(file)).contentType)
-  
+  def iconForFile(file: File) =
+    if (file.isDirectory)
+      getIcon("/images/small-icons/mimetypes/folder.png")
+    else
+      iconFromContentType((FileBuffer(file)).contentType)
+
   def iconFromContentType(contentType: String) = contentType.toLowerCase match {
     case "text/c" => getIcon("/images/small-icons/mimetypes/source_c.png")
     case "text/cpp" => getIcon("/images/small-icons/mimetypes/source_cpp.png")
@@ -134,11 +134,11 @@ object Utils {
     case "text/xml" => getIcon("/images/small-icons/mimetypes/resource.png")
     case _ => getIcon("/images/small-icons/mimetypes/txt.png")
   }
-  
+
   val propertiesDir = new File(new File(System.getProperty("user.home")), ".scalaedit")
-  
-  def showErrorMessage(parent:Component = null, message:String){
-	  Dialog.showMessage(parent,
+
+  def showErrorMessage(parent: Component = null, message: String) {
+    Dialog.showMessage(parent,
       message = message,
       title = "Error",
       messageType = Dialog.Message.Error)

@@ -24,7 +24,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
 class SBTConsoleWithErrorList extends ConsolePanel {
- 
+
   val consoleType = SBTConsole
 
   private val sbtConsolePanel = new SBTConsolePanel()
@@ -170,7 +170,7 @@ class SBTConsoleWithErrorList extends ConsolePanel {
   private var toMatchOn = new StringBuffer()
 
   private val beginning = """(?s)(.*Compiling.*sources.*)""".r
-  
+
   private case object FirstErrorLine {
 
     val regexpLine = """(?s).*error.*0m(.*):(\d*):(.*)\e.*""" //""".*\[.*e.*r.*r.*o.*r.*\]0m(.*):([^:]*):\s*(.*)\n"""
@@ -216,7 +216,7 @@ class SBTConsoleWithErrorList extends ConsolePanel {
   val end = """(?s)(.*==\s*compile\s*==.*)""".r
 
   var codeNotifications: List[CodeNotification] = Nil
-  
+
   sbtConsolePanel.addInvokeOnConsoleOutput((in: Int) => {
     toMatchOn.append(in.toChar)
 

@@ -26,11 +26,11 @@ abstract class EditorsPanel extends TabbedPane {
 
   tabLayoutPolicy = TabbedPane.Layout.Scroll
 
-  def shutDownAllOpenResources(keepCurrentOpen:Boolean = false) = {
-  	val pagesToClose = 
-  		if(keepCurrentOpen) pages.filter(_.content.peer != peer.getSelectedComponent())
-  		else pages
-  		
+  def shutDownAllOpenResources(keepCurrentOpen: Boolean = false) = {
+    val pagesToClose =
+      if (keepCurrentOpen) pages.filter(_.content.peer != peer.getSelectedComponent())
+      else pages
+
     val toClose = pagesToClose.filter(_.content.asInstanceOf[Closeable].close())
 
     toClose.foreach(pages -= _)
@@ -89,70 +89,68 @@ abstract class EditorsPanel extends TabbedPane {
     editorPanel
   }
 
-  def addLicenseView(name:String, resourcePath:String) {
+  def addLicenseView(name: String, resourcePath: String) {
 
-      val tabComponent = new ButtonTabComponentImpl(this, () =>Unit);
+    val tabComponent = new ButtonTabComponentImpl(this, () => Unit);
 
-      val newEditorPanel = new LicenseView(resourcePath)
+    val newEditorPanel = new LicenseView(resourcePath)
 
-      pages += new TabbedPane.Page(name, newEditorPanel)
+    pages += new TabbedPane.Page(name, newEditorPanel)
 
-      peer.setTabComponentAt(pages.size - 1, tabComponent)
+    peer.setTabComponentAt(pages.size - 1, tabComponent)
 
-      peer.setSelectedComponent(newEditorPanel.peer)
+    peer.setSelectedComponent(newEditorPanel.peer)
 
   }
 
   listenTo(mouse.clicks)
 
-	def currentEditorPanel = pages.find(_.content.peer == peer.getSelectedComponent()) match{
-		case Some(page) if (page.content.isInstanceOf[EditorPanel]) => 
-			Some(page.content.asInstanceOf[EditorPanel])
-		case _ => None
-	}
+  def currentEditorPanel = pages.find(_.content.peer == peer.getSelectedComponent()) match {
+    case Some(page) if (page.content.isInstanceOf[EditorPanel]) =>
+      Some(page.content.asInstanceOf[EditorPanel])
+    case _ => None
+  }
 
-	def editorPanelSelected = currentEditorPanel match {
-		case Some(_) => true
-		case _ => false
-	}
-	
-	
-	def openSelectedInProjectBrowser(){
-		currentEditorPanel.foreach(_.fileBuffer.file.foreach(ProjectsPanel().selectFile(_)))
-	}
+  def editorPanelSelected = currentEditorPanel match {
+    case Some(_) => true
+    case _ => false
+  }
+
+  def openSelectedInProjectBrowser() {
+    currentEditorPanel.foreach(_.fileBuffer.file.foreach(ProjectsPanel().selectFile(_)))
+  }
 
   reactions += {
-  	case MousePressed(_, point, _, _, triggersPopup) 
-  			if(triggersPopup && editorPanelSelected) => {
-	  	val editorPanel = currentEditorPanel.get
-	  	//Display popup
-	  	(new PopupMenu() {
-				add(new MenuItem(new Action("Select in Project Browser"){
-					icon = Utils.getIcon("/images/small-icons/go-up.png")
-					def apply = openSelectedInProjectBrowser()
-		  	}))
-		  	editorPanel.fileBuffer.file.foreach((file)=>{
-		  		def nicifyPath(p:String) =
-		  			if(p.size <= 50) p
-		  			else "..." + p.takeRight(47)
-		  		addSeparator()
-		  		add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())){
-						tooltip = file.getCanonicalPath()
-						icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
-						def apply = Utils.clipboardContents = file.getCanonicalPath()
-		  		}))
-		  	})
-		  	addSeparator()
-		  	add(new MenuItem(new Action("Close All"){
-					icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
-					def apply = shutDownAllOpenResources()
-		  	}))
-		  	add(new MenuItem(new Action("Close All Except This"){
-					icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
-					def apply = shutDownAllOpenResources(true)
-		  	}))
-		  }).peer.show(this.peer, point.x, point.y)
-  	}
+    case MousePressed(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
+      val editorPanel = currentEditorPanel.get
+      //Display popup
+      (new PopupMenu() {
+        add(new MenuItem(new Action("Select in Project Browser") {
+          icon = Utils.getIcon("/images/small-icons/go-up.png")
+          def apply = openSelectedInProjectBrowser()
+        }))
+        editorPanel.fileBuffer.file.foreach((file) => {
+          def nicifyPath(p: String) =
+            if (p.size <= 50) p
+            else "..." + p.takeRight(47)
+          addSeparator()
+          add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())) {
+            tooltip = file.getCanonicalPath()
+            icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+            def apply = Utils.clipboardContents = file.getCanonicalPath()
+          }))
+        })
+        addSeparator()
+        add(new MenuItem(new Action("Close All") {
+          icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+          def apply = shutDownAllOpenResources()
+        }))
+        add(new MenuItem(new Action("Close All Except This") {
+          icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+          def apply = shutDownAllOpenResources(true)
+        }))
+      }).peer.show(this.peer, point.x, point.y)
+    }
   }
 
   private var currentNotifications: List[CodeNotification] = Nil

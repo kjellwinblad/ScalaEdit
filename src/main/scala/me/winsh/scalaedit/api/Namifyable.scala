@@ -11,6 +11,6 @@ the Free Software Foundation, either version 3 of the License, or
 package me.winsh.scalaedit.api
 
 trait Namifyable {
-	def name_=(icon:String)
-	def name:String
+  def name_=(icon: String)
+  def name: String
 }

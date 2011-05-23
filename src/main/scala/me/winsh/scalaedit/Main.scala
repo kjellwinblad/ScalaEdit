@@ -21,30 +21,30 @@ import java.io.File
 
 object Main {
 
-	//Initialize properties dir
-	Utils.propertiesDir.mkdir()
+  //Initialize properties dir
+  Utils.propertiesDir.mkdir()
 
-	private val splash = SplashScreen.getSplashScreen()
+  private val splash = SplashScreen.getSplashScreen()
   if (splash != null) {
-  	splash.setImageURL(this.getClass.getResource("/images/img3.png"))
-  	splash.update()    
+    splash.setImageURL(this.getClass.getResource("/images/img3.png"))
+    splash.update()
   }
 
-	val window = new MainWindow(){
-		override def closeOperation:Unit = if(shutDownOpenResources()){
-			visible = false
-			dispose() 
-			sys.exit()
-		}
-	}
+  val window = new MainWindow() {
+    override def closeOperation: Unit = if (shutDownOpenResources()) {
+      visible = false
+      dispose()
+      sys.exit()
+    }
+  }
 
-  def main(args:Array[String]) = {
+  def main(args: Array[String]) = {
 
-		if(splash != null)
-			splash.close()
-			
+    if (splash != null)
+      splash.close()
+
     window.visible = true
-    
+
   }
 
 }

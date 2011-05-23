@@ -4,4 +4,5 @@ class Plugins(info: sbt.ProjectInfo) extends sbt.PluginDefinition(info) {
   lazy val eclipse = "de.element34" % "sbt-eclipsify" % "0.7.0"
   val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
   val assemblySBT = "com.codahale" % "assembly-sbt" % "0.1.1"
+  val formatter = "com.github.olim7t" % "sbt-scalariform" % "1.0.3"
 }

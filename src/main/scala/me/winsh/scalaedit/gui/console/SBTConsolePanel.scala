@@ -45,7 +45,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
     val process = {
       //Check if SBT is in properties dir
 
-      val sbtJarName = "sbt-launch-0.7.6.RC0.jar"
+      val sbtJarName = "sbt-launch-0.7.7.jar"
 
       try {
         val javaFile = new File(new File(System.getProperty("java.home"), "bin"), "java")
@@ -79,23 +79,23 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
         }
 
-				val classPath = System.getProperty("java.class.path")
+        val classPath = System.getProperty("java.class.path")
 
-				if(System.getProperty("os.name").toLowerCase.contains("windows"))
-					echoInput = true
+        if (System.getProperty("os.name").toLowerCase.contains("windows"))
+          echoInput = true
 
-				val sbtProperties = new SBTConsolePanelProperties()
+        val sbtProperties = new SBTConsolePanelProperties()
 
-				val args:java.util.List[String] = 
-					javaPath::
-					sbtProperties.javaVMArguments.split(" ").toList::: 
-					"-cp":: 
-					sbtJarFile.getAbsolutePath:: 
-					"xsbt.boot.Boot"::
-					(if(sbtProperties.arguments.size==0) List[String]()
-					 else sbtProperties.arguments.split(" ").toList):::Nil
-				
-				val pb = new ProcessBuilder(args)
+        val args: java.util.List[String] =
+          javaPath ::
+            sbtProperties.javaVMArguments.split(" ").toList :::
+            "-cp" ::
+            sbtJarFile.getAbsolutePath ::
+            "xsbt.boot.Boot" ::
+            (if (sbtProperties.arguments.size == 0) List[String]()
+            else sbtProperties.arguments.split(" ").toList) ::: Nil
+
+        val pb = new ProcessBuilder(args)
 
         pb.directory(sbtProperties.startingDir)
 
@@ -122,18 +122,18 @@ class SBTConsolePanel extends VT320ConsoleBase {
       @tailrec
       def readFromStream(in: InputStream) {
 
-          in.read() match {
-            case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
-            case -1 => onlyOneStreamLeft.set(true)
-            case v => {
-              readQueue.put(v)
-              readFromStream(in) //Recursive call
-            }
+        in.read() match {
+          case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
+          case -1 => onlyOneStreamLeft.set(true)
+          case v => {
+            readQueue.put(v)
+            readFromStream(in) //Recursive call
           }
+        }
       }
 
-      Utils.runInNewThread(() => try{readFromStream(in)}catch{case _ =>})
-      Utils.runInNewThread(() => try{readFromStream(err)}catch{case _ =>})
+      Utils.runInNewThread(() => try { readFromStream(in) } catch { case _ => })
+      Utils.runInNewThread(() => try { readFromStream(err) } catch { case _ => })
 
       def read(): Int = readQueue.take()
 
@@ -163,8 +163,9 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
     } catch {
       case _ => //Ignore, this could be that the stream is closed or similar
-    }finally{
-    	//In case it has not terminated with the exit command
+    }
+    finally {
+      //In case it has not terminated with the exit command
       sbtProcess.process.destroy()
     }
     true

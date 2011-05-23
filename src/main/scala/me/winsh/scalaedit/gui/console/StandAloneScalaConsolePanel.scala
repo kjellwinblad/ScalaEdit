@@ -51,37 +51,36 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 
     val process = {
 
-			try{
+      try {
 
-				val javaFile = new File(new File(System.getProperty("java.home"), "bin"), "java")
+        val javaFile = new File(new File(System.getProperty("java.home"), "bin"), "java")
 
         val javaPath = javaFile.exists match {
           case true => javaFile.getAbsolutePath
           case false => "java"
         }
-				
-				val classPath = System.getProperty("java.class.path")
-				
-				if(System.getProperty("os.name").toLowerCase.contains("windows"))
-					echoInput = true
 
-				
-				val scalaProperties = new StandAloneScalaConsolePanelProperties()
+        val classPath = System.getProperty("java.class.path")
 
-				val args:java.util.List[String] = 
-					javaPath::
-					scalaProperties.javaVMArguments.split(" ").toList::: 
-					"-cp":: 
-					(classPath + 
-						(if(scalaProperties.javaClasspath=="")"" else":" +scalaProperties.javaClasspath)):: 
-					"scala.tools.nsc.MainGenericRunner"::
-					"-usejavacp"::
-					(if(scalaProperties.arguments.size==0)List[String]()
-					 else scalaProperties.arguments.split(" ").toList):::Nil
+        if (System.getProperty("os.name").toLowerCase.contains("windows"))
+          echoInput = true
 
-				val pb =
-        	new ProcessBuilder(args)
-				
+        val scalaProperties = new StandAloneScalaConsolePanelProperties()
+
+        val args: java.util.List[String] =
+          javaPath ::
+            scalaProperties.javaVMArguments.split(" ").toList :::
+            "-cp" ::
+            (classPath +
+              (if (scalaProperties.javaClasspath == "") "" else ":" + scalaProperties.javaClasspath)) ::
+              "scala.tools.nsc.MainGenericRunner" ::
+              "-usejavacp" ::
+              (if (scalaProperties.arguments.size == 0) List[String]()
+              else scalaProperties.arguments.split(" ").toList) ::: Nil
+
+        val pb =
+          new ProcessBuilder(args)
+
         pb.directory(Utils.projectDir)
 
         pb.start()
@@ -107,18 +106,18 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
       @tailrec
       def readFromStream(in: InputStream) {
 
-          in.read() match {
-            case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
-            case -1 => onlyOneStreamLeft.set(true)
-            case v => {
-              readQueue.put(v)
-              readFromStream(in) //Recursive call
-            }
+        in.read() match {
+          case -1 if (onlyOneStreamLeft.get()) => readQueue.put(-1)
+          case -1 => onlyOneStreamLeft.set(true)
+          case v => {
+            readQueue.put(v)
+            readFromStream(in) //Recursive call
           }
+        }
       }
 
-      Utils.runInNewThread(() => try{readFromStream(in)}catch{case _ =>})
-      Utils.runInNewThread(() => try{readFromStream(err)}catch{case _ =>})
+      Utils.runInNewThread(() => try { readFromStream(in) } catch { case _ => })
+      Utils.runInNewThread(() => try { readFromStream(err) } catch { case _ => })
 
       def read(): Int = readQueue.take()
 
@@ -146,12 +145,12 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
       stop()
     } catch {
       case _ => //Ignore, this could be that the stream is closed or similar
-    }finally{
-    	//Make sure that it really is dead
-    	scalaProcess.process.destroy()
+    }
+    finally {
+      //Make sure that it really is dead
+      scalaProcess.process.destroy()
     }
     true
   }
-
 
 }

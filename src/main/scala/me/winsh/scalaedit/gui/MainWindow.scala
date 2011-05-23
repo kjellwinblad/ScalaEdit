@@ -33,8 +33,8 @@ import javax.swing.event.MenuEvent
 
 class MainWindow extends Frame {
 
-  val version = "0.1.8"
- 
+  val version = "0.2.0"
+
   title = "ScalaEdit (" + version + ")"
 
   iconImage = Utils.getImage("/images/img3.png")
@@ -45,24 +45,23 @@ class MainWindow extends Frame {
 
   val projectsPanel = ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
-	peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
+  peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
 
-  def shutDownOpenResources() = 
-	  if(editorsPanel.shutDownAllOpenResources()){
-	  	consolesPanel.shutDownAllOpenResources()
-	  	true
-	  }else false
+  def shutDownOpenResources() =
+    if (editorsPanel.shutDownAllOpenResources()) {
+      consolesPanel.shutDownAllOpenResources()
+      true
+    } else false
 
-  
   menuBar = new MenuBar() {
 
     val fileMenu = new Menu("File") {
 
-    	mnemonic = Key.F
+      mnemonic = Key.F
 
       contents += new MenuItem(new Action("New") {
 
-				accelerator = Some(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK))
+        accelerator = Some(KeyStroke.getKeyStroke('N', InputEvent.CTRL_DOWN_MASK))
 
         icon = Utils.getIcon("/images/small-icons/actions/filenew.png")
 
@@ -74,7 +73,7 @@ class MainWindow extends Frame {
 
       contents += new MenuItem(new Action("Open...") {
 
-				accelerator = Some(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK))
+        accelerator = Some(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK))
 
         icon = Utils.getIcon("/images/small-icons/actions/fileopen.png")
 
@@ -110,54 +109,53 @@ class MainWindow extends Frame {
 
     val projectMenu = new Menu("Project") {
 
-			mnemonic = Key.P
+      mnemonic = Key.P
 
-			peer.addMenuListener(new MenuListener(){
-					def menuCanceled(e:MenuEvent) {}
-					def menuDeselected(e:MenuEvent) {}
-					def menuSelected(e:MenuEvent) {
-						prepareMenu()
-					}
-			})
+      peer.addMenuListener(new MenuListener() {
+        def menuCanceled(e: MenuEvent) {}
+        def menuDeselected(e: MenuEvent) {}
+        def menuSelected(e: MenuEvent) {
+          prepareMenu()
+        }
+      })
 
-			def prepareMenu(){
-	      contents.clear()
-			  contents += new MenuItem(new Action("Change Project Root...") {
-		
-		    icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
-		
-			    def apply() {
-			      projectsPanel.changeRootAction()
-			    }
-		
-		   	})
+      def prepareMenu() {
+        contents.clear()
+        contents += new MenuItem(new Action("Change Project Root...") {
 
-				val recentPathItems = try{
-			   	val src = Source.fromFile(new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs"))
+          icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
 
-					contents += new Separator()
-					
-			   	src.getLines().foreach((path)=>{
-			   		contents += new MenuItem(Action(path){
-			   			projectsPanel.changeRoot(new File(path))
-			   		})
-			   	})
+          def apply() {
+            projectsPanel.changeRootAction()
+          }
 
-			   	src.close()
-				}catch{
-					case _ => 
-				}
+        })
 
-		    //revalidate()
-			}
-    	
+        val recentPathItems = try {
+          val src = Source.fromFile(new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs"))
+
+          contents += new Separator()
+
+          src.getLines().foreach((path) => {
+            contents += new MenuItem(Action(path) {
+              projectsPanel.changeRoot(new File(path))
+            })
+          })
+
+          src.close()
+        } catch {
+          case _ =>
+        }
+
+        //revalidate()
+      }
 
     }
 
     val terminalMenu = new Menu("Terminal") {
 
-			mnemonic = Key.T
-    	
+      mnemonic = Key.T
+
       contents += new MenuItem(new Action("New Scala Terminal") {
 
         icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
@@ -167,7 +165,7 @@ class MainWindow extends Frame {
         }
 
       })
-      
+
       contents += new MenuItem(new Action("New SBT Terminal") {
 
         icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
@@ -178,34 +176,34 @@ class MainWindow extends Frame {
 
       })
 
-      contents += new Menu("Properties"){
-	      contents += new MenuItem(new Action("SBT Terminal Properties...") {
-	
-	        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
-	
-	        def apply() {
-	        	val props = new SBTConsolePanelProperties()
-	          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
-	        }
-	
-	      })
-		    contents += new MenuItem(new Action("Scala Terminal Properties...") {
-	
-	        icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
-	
-	        def apply() {
-	        	val props = new StandAloneScalaConsolePanelProperties()
-	          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
-	        }
-	
-	      })
+      contents += new Menu("Properties") {
+        contents += new MenuItem(new Action("SBT Terminal Properties...") {
+
+          icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
+
+          def apply() {
+            val props = new SBTConsolePanelProperties()
+            editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+          }
+
+        })
+        contents += new MenuItem(new Action("Scala Terminal Properties...") {
+
+          icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
+
+          def apply() {
+            val props = new StandAloneScalaConsolePanelProperties()
+            editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+          }
+
+        })
       }
     }
 
     val helpMenu = new Menu("Help") {
 
-			mnemonic = Key.H
-  		
+      mnemonic = Key.H
+
       contents += new MenuItem(Action("About") {
 
         val text =
@@ -229,54 +227,54 @@ class MainWindow extends Frame {
       })
 
       contents += new Menu("Licenses") {
-				contents += new MenuItem(Action("ScalaEdit"){
-					EditorsPanel().addLicenseView("ScalaEdit License", "/licenses/scala_edit_license")
-				})
-				contents += new Separator()
-				contents += new MenuItem(Action("RSyntaxTextArea"){
-					EditorsPanel().addLicenseView("RSyntaxTextArea License", "/licenses/rsyntaxtextarea_license")
-				})
-				contents += new MenuItem(Action("Scala"){
-					EditorsPanel().addLicenseView("Scala License", "/licenses/scala_licence")
-				})
-				contents += new MenuItem(Action("sbt (Simple Build Tool)"){
-					EditorsPanel().addLicenseView("sbt License", "/licenses/sbt_license")
-				})
-				contents += new MenuItem(Action("JLine"){
-					EditorsPanel().addLicenseView("JLine License", "/licenses/jline_license")
-				})
-				contents += new MenuItem(Action("Apache log4j"){
-					EditorsPanel().addLicenseView("Apache log4j License", "/licenses/log4j_license")
-				})
-				contents += new MenuItem(Action("JTA - Telnet/SSH for Java"){
-					EditorsPanel().addLicenseView("JTA License", "/licenses/jta_license")
-				})
+        contents += new MenuItem(Action("ScalaEdit") {
+          EditorsPanel().addLicenseView("ScalaEdit License", "/licenses/scala_edit_license")
+        })
+        contents += new Separator()
+        contents += new MenuItem(Action("RSyntaxTextArea") {
+          EditorsPanel().addLicenseView("RSyntaxTextArea License", "/licenses/rsyntaxtextarea_license")
+        })
+        contents += new MenuItem(Action("Scala") {
+          EditorsPanel().addLicenseView("Scala License", "/licenses/scala_licence")
+        })
+        contents += new MenuItem(Action("sbt (Simple Build Tool)") {
+          EditorsPanel().addLicenseView("sbt License", "/licenses/sbt_license")
+        })
+        contents += new MenuItem(Action("JLine") {
+          EditorsPanel().addLicenseView("JLine License", "/licenses/jline_license")
+        })
+        contents += new MenuItem(Action("Apache log4j") {
+          EditorsPanel().addLicenseView("Apache log4j License", "/licenses/log4j_license")
+        })
+        contents += new MenuItem(Action("JTA - Telnet/SSH for Java") {
+          EditorsPanel().addLicenseView("JTA License", "/licenses/jta_license")
+        })
       }
 
-			contents += new Separator()
+      contents += new Separator()
 
-			val desktop = Desktop.getDesktop
-			
-      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Scala API</u></font>"""){
-      	desktop.browse(new URI("http://www.scala-lang.org/api/current/index.html"))
+      val desktop = Desktop.getDesktop
+
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Scala API</u></font>""") {
+        desktop.browse(new URI("http://www.scala-lang.org/api/current/index.html"))
       })
 
-      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Java API</u></font>"""){
-      	desktop.browse(new URI("http://download.oracle.com/javase/6/docs/api/"))
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>Java API</u></font>""") {
+        desktop.browse(new URI("http://download.oracle.com/javase/6/docs/api/"))
       })
 
-      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt documentation</u></font>"""){
-      	desktop.browse(new URI("http://code.google.com/p/simple-build-tool/"))
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt documentation</u></font>""") {
+        desktop.browse(new URI("http://code.google.com/p/simple-build-tool/"))
       })
 
-      contents += new MenuItem(Action("""<html><font color="BLUE"><u>ScalaEdit Web Site</u></font>"""){
-      	desktop.browse(new URI("http://code.google.com/p/scala-edit/"))
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>ScalaEdit Web Site</u></font>""") {
+        desktop.browse(new URI("http://code.google.com/p/scala-edit/"))
       })
 
     }
 
     contents += fileMenu
-    
+
     contents += projectMenu
 
     contents += terminalMenu
@@ -292,32 +290,32 @@ class MainWindow extends Frame {
     resizeWeight = 1.0
 
     val editorProjectSplitPane = new SplitPane() {
-    	resizeWeight = 0.0
+      resizeWeight = 0.0
       orientation = Orientation.Vertical
       leftComponent = projectsPanel
       rightComponent = editorsPanel
     }
 
     editorProjectSplitPane.oneTouchExpandable = true
-    
+
     leftComponent = editorProjectSplitPane
     rightComponent = consolesPanel
 
   }
   mainSplitPane.oneTouchExpandable = true
 
-	preferredSize = new Dimension(800,700)
+  preferredSize = new Dimension(800, 700)
 
-	size = new Dimension(800,700)
-	
+  size = new Dimension(800, 700)
+
   contents = mainSplitPane
 
-	mainSplitPane.dividerLocation = 477
+  mainSplitPane.dividerLocation = 477
 
-	mainSplitPane.editorProjectSplitPane.dividerLocation = 200
-	
-	pack()
+  mainSplitPane.editorProjectSplitPane.dividerLocation = 200
 
-	maximize()
+  pack()
+
+  maximize()
 
 }
