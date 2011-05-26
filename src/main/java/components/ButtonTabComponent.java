@@ -104,7 +104,10 @@ public class ButtonTabComponent extends JPanel{
     }
 
     public String getName(){
-    	return label.getText();
+    	if(label == null)
+    		return "";
+    	else
+    		return label.getText();
     }
     
     private class TabButton extends JButton implements ActionListener {

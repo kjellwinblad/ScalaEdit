@@ -12,8 +12,10 @@ package me.winsh.scalaedit
 
 import me.winsh.scalaedit.gui.MainWindow
 import me.winsh.scalaedit.gui.Utils
+import me.winsh.scalaedit.gui.ThemeProperties
 import scala.swing._
 import java.awt.Toolkit
+import javax.swing.UIManager
 import java.awt.Point
 import java.awt.SplashScreen
 import java.awt.event._
@@ -30,20 +32,31 @@ object Main {
     splash.update()
   }
 
-  val window = new MainWindow() {
-    override def closeOperation: Unit = if (shutDownOpenResources()) {
-      visible = false
-      dispose()
-      sys.exit()
-    }
-  }
-
   def main(args: Array[String]) = {
 
     if (splash != null)
       splash.close()
 
-    window.visible = true
+    Utils.swingInvokeLater(() => {
+
+      //val themeProperties = new ThemeProperties()
+
+      //UIManager.setLookAndFeel(themeProperties.theme)
+
+      val window = new MainWindow() {
+        override def closeOperation: Unit = Utils.swingInvokeAndWait(() => {
+          if (shutDownOpenResources()) {
+            visible = false
+            dispose()
+            Thread.sleep(500)
+            sys.exit()
+          }
+        })
+      }
+
+      window.visible = true
+
+    })
 
   }
 

@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 package me.winsh.scalaedit.gui.console
 
 import scala.swing._
-import javax.swing._
+import javax.swing.JToolBar
 import de.mud.terminal.vt320
 import de.mud.terminal.SwingTerminal
 import java.awt.BorderLayout
@@ -35,6 +35,8 @@ import java.io.FileOutputStream
 import scala.util.matching.Regex
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
+import javax.swing.KeyStroke
+import java.awt.event.InputEvent
 
 class SBTConsolePanel extends VT320ConsoleBase {
 
@@ -171,4 +173,64 @@ class SBTConsolePanel extends VT320ConsoleBase {
     true
   }
 
+  object toolBar extends JToolBar {
+
+    def add(a: Action) = super.add(a.peer)
+
+    add(new Action("") {
+      accelerator = Some(KeyStroke.getKeyStroke('R', InputEvent.CTRL_DOWN_MASK))
+      toolTip = "SBT Run Action"
+      icon = Utils.getIcon("/images/small-icons/play.png")
+      def apply() {
+        emulation.write("\n\nrun\n".map(_.toByte).toArray)
+      }
+    })
+
+    add(new Action("") {
+      toolTip = "SBT Compile Action"
+      icon = Utils.getIcon("/images/completions/class.png")
+      def apply() {
+        emulation.write("\n\ncompile\n".map(_.toByte).toArray)
+      }
+    })
+
+    add(new Action("") {
+      toolTip = "SBT Test Action"
+      icon = Utils.getIcon("/images/small-icons/illustrations/test.png")
+      def apply() {
+        emulation.write("\n\ntest\n".map(_.toByte).toArray)
+      }
+    })
+
+    add(new JToolBar.Separator)
+
+    add(new Action("") {
+      toolTip = "SBT Continuous Compile Action"
+      icon = Utils.getIcon("/images/small-icons/illustrations/compilecontinus.png")
+      def apply() {
+        emulation.write("\n\n~compile\n".map(_.toByte).toArray)
+      }
+    })
+
+    add(new Action("") {
+      toolTip = "SBT Console Action"
+      icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
+      def apply() {
+        emulation.write("\n\nconsole\n".map(_.toByte).toArray)
+      }
+    })
+
+    add(new JToolBar.Separator)
+
+    add(new Action("") {
+      toolTip = "SBT Help Action"
+      icon = Utils.getIcon("/images/small-icons/illustrations/help.png")
+      def apply() {
+        emulation.write("\n\nhelp\n".map(_.toByte).toArray)
+      }
+    })
+
+  }
+
+  add(Component.wrap(toolBar), BorderPanel.Position.North)
 }

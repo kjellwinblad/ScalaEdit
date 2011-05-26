@@ -48,7 +48,7 @@ trait VT320ConsoleBase extends ConsolePanel {
 
   private val linesInEmulator = 100
 
-  private val emulation: vt320 = new vt320(80, linesInEmulator) {
+  val emulation: vt320 = new vt320(80, linesInEmulator) {
     def write(b: Array[Byte]) {
       if (echoInput) {
         //Replace the byte 10 or 13 with 10,13
@@ -82,7 +82,7 @@ trait VT320ConsoleBase extends ConsolePanel {
 
       icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
 
-      def apply() = inOutSource.output.write(Utils.clipboardContents.replaceAll("\t", "  ").map(_.toByte).toArray)
+      def apply() = emulation.write(Utils.clipboardContents.replaceAll("\t", "  ").map(_.toByte).toArray)
 
     }))
 

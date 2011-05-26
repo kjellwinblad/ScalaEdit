@@ -30,6 +30,10 @@ import scala.swing.event._
 import scala.io.Source
 import javax.swing.event.MenuListener
 import javax.swing.event.MenuEvent
+import javax.swing.LookAndFeel
+import javax.swing.SwingUtilities
+import javax.swing.UIManager
+import java.awt.Toolkit
 
 class MainWindow extends Frame {
 
@@ -176,8 +180,47 @@ class MainWindow extends Frame {
 
       })
 
-      contents += new Menu("Properties") {
-        contents += new MenuItem(new Action("SBT Terminal Properties...") {
+    }
+
+    val propertiesMenu = new Menu("Properties") {
+      /*
+			contents += new Menu("Theme") {
+				val lookAndFeels = UIManager.getInstalledLookAndFeels
+
+					val items = for(lookAndFeel <- lookAndFeels) yield {
+						new RadioMenuItem(lookAndFeel.getName){
+
+							selected = (lookAndFeel.getClassName==UIManager.getLookAndFeel().getClass().getName())
+							
+							action = Action(lookAndFeel.getName){
+              	UIManager.setLookAndFeel(lookAndFeel.getClassName)
+                SwingUtilities.updateComponentTreeUI(MainWindow.this.peer)
+                projectsPanel.changeRoot(Utils.projectDir)
+                MainWindow.this.contents.foreach(_.revalidate())
+
+                Dialog.showMessage(
+          				message = """To reload another theme is known to work badly sometimes.
+You may need to restart ScalaEdit if you experience strange 
+colours or behaviour after theme change.""",
+          				title = "Theme Switch Information")
+
+								
+								
+									
+          			val themeProperties = new ThemeProperties()
+          			themeProperties.theme = lookAndFeel.getClassName
+							}
+						}
+					}
+
+					items.foreach(contents += _)		
+
+					val group = new ButtonGroup(items:_*)
+				
+			}
+			*/
+      contents += new Menu("Terminal") {
+        contents += new MenuItem(new Action("SBT Terminal...") {
 
           icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
 
@@ -187,7 +230,7 @@ class MainWindow extends Frame {
           }
 
         })
-        contents += new MenuItem(new Action("Scala Terminal Properties...") {
+        contents += new MenuItem(new Action("Scala Terminal...") {
 
           icon = Utils.getIcon("/images/small-icons/illustrations/scala-terminal.png")
 
@@ -279,6 +322,8 @@ class MainWindow extends Frame {
 
     contents += terminalMenu
 
+    contents += propertiesMenu
+
     contents += Swing.HGlue
 
     contents += helpMenu
@@ -310,7 +355,7 @@ class MainWindow extends Frame {
 
   contents = mainSplitPane
 
-  mainSplitPane.dividerLocation = 477
+  mainSplitPane.dividerLocation = 440
 
   mainSplitPane.editorProjectSplitPane.dividerLocation = 200
 
