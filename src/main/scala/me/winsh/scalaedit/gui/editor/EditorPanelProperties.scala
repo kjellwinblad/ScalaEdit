@@ -13,16 +13,18 @@ package me.winsh.scalaedit.gui
 import me.winsh.scalaedit.api._
 import java.io.File
 import me.winsh.scalaedit.gui._
-import javax.swing.UIManager
+import java.awt.Color
 
-class ThemeProperties
-  extends PropertiesFile(new File(Utils.propertiesDir, "theme.properties"),
-    """Theme Properties
+class EditorPanelProperties
+  extends PropertiesFile(new File(Utils.propertiesDir, "editor.properties"),
+    """Editor Properties""") {
 
-This properties file is modified from the user interface.
-""") {
+	val tabLengthInSpaces = new IntProperty("tab_length_in_spaces", 2)
 
-  val theme =  new StringProperty("theme_class_name", UIManager.getLookAndFeel().getClass().getName())
+	val wrapLines = new BooleanProperty("wrap_lines", false)
 
+	val errorLineColor = new ColorProperty("error_line_color", new Color(1.0f,0.0f,0.0f,0.4f))
+
+	val warningLineColor = new ColorProperty("warning_line_color", new Color(1.0f,1.0f,0.0f,0.9f))
 
 }

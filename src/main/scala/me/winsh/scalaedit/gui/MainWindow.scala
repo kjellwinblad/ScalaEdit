@@ -219,6 +219,12 @@ colours or behaviour after theme change.""",
 				
 			}
 			*/
+			contents += new Menu("Editor") {
+				contents += new MenuItem(Action("General...") {
+					  val props = new EditorPanelProperties()
+            editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+				})
+			}
       contents += new Menu("Terminal") {
         contents += new MenuItem(new Action("SBT Terminal...") {
 

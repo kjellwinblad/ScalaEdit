@@ -25,29 +25,25 @@ The value of the arguments propery will be sent to the process. It is optional.
 """ +
       comments) {
 
-  protected val javaVMArgumentsID = "java_vm_arguments"
-  def javaVMArguments: String = props.getProperty(javaVMArgumentsID)
-  def javaVMArguments_=(args: String) {
-    props.setProperty(javaVMArgumentsID, args)
-    save()
-  }
+  val javaVMArguments = new StringProperty("java_vm_arguments")
 
-  private val startingDirID = "starting_dir"
-  def startingDir: File = props.getProperty(startingDirID) match {
-    case "CURRENT_PROJECT_DIR" => Utils.projectDir
-    case p => new File(p)
-  }
-  def startingDir_=(args: String) {
-    props.setProperty(startingDirID, args)
-    save()
-  }
-  if (props.getProperty(startingDirID) == null) startingDir = "CURRENT_PROJECT_DIR"
+  val startingDir = {
+  	val defaultCurrentProjectDir = "CURRENT_PROJECT_DIR"
+  	val startingDirStringProp = new StringProperty("starting_dir", defaultCurrentProjectDir)
 
-  private val argumentsID = "arguments"
-  def arguments: String = props.getProperty(argumentsID)
-  def arguments_=(args: String) {
-    props.setProperty(argumentsID, args)
-    save()
+  	new Property[File]("", new File(".")){
+  		def get = 
+  			if(startingDirStringProp.get.trim == defaultCurrentProjectDir) Utils.projectDir
+  			else new File(startingDirStringProp.get) 
+  				
+  		def set(value:File){
+  			startingDirStringProp.set(value.getCanonicalPath)
+  		}
+  	}
   }
-  if (arguments == null) arguments = ""
+  
+  val arguments = new StringProperty("arguments")
+
+  val echoInput = new BooleanProperty("echo_input", 
+  	System.getProperty("os.name").toLowerCase.contains("windows"))
 }

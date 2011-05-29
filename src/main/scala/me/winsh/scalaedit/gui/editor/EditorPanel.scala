@@ -33,6 +33,8 @@ import javax.swing.KeyStroke
 
 class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
+	private val properties = new EditorPanelProperties()
+
   private var savedVar = true
   private val saveAsIcon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
   private val saveIcon = Utils.getIcon("/images/small-icons/actions/filesave.png")
@@ -66,7 +68,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   editorPane.setSyntaxEditingStyle(syntaxStyleFromContentType(fileBuffer.contentType))
 
-  editorPane.setTabSize(2)
+  editorPane.setTabSize(properties.tabLengthInSpaces.get)
 
   val scrollPane = new RTextScrollPane(editorPane);
 
@@ -130,7 +132,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     //add(copyAction)
     //add(pasteAction)
     add(new JToolBar.Separator)
-    add(new ToggleButton() { action = wrapLinesAction })
+    add(new ToggleButton() { 
+    	action = wrapLinesAction
+    	if(properties.wrapLines.get){
+    		selected = true
+    		wrapLinesAction()
+    	}else selected = false
+    	
+    })
   }
 
   add(Component.wrap(toolBar), BorderPanel.Position.North)
@@ -502,6 +511,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   editorPane.addFocusListener(new FocusListener() {
     def focusGained(e: FocusEvent) {
+      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK), gotoLineAction.peer)
+      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), saveAction.peer)
+      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), searchAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), searchAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK), gotoLineAction.peer)
@@ -532,8 +544,8 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   } else true
 
   def notifyAboutCodeInfo(notification: CodeNotification): Unit = notification match {
-    case Error(_, line, _) => editorPane.addLineHighlight(line - 1, java.awt.Color.RED)
-    case Warning(_, line, _) => editorPane.addLineHighlight(line - 1, java.awt.Color.YELLOW)
+    case Error(_, line, _) => editorPane.addLineHighlight(line - 1, properties.errorLineColor.get)
+    case Warning(_, line, _) => editorPane.addLineHighlight(line - 1, properties.warningLineColor.get)
   }
 
   def notifyAboutClearCodeInfo() {

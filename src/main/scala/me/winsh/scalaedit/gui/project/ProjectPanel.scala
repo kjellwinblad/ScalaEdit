@@ -240,6 +240,8 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
   def changeRoot(root: File) {
 
+    root.mkdirs()
+
     tree = new ProjectTree(root)
 
     Utils.projectDir = root
