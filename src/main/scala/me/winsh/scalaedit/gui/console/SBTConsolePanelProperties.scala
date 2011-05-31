@@ -18,7 +18,7 @@ class SBTConsolePanelProperties extends StandAloneConsoleProperties(
   new File(Utils.propertiesDir, "sbt_console.properties"),
   "SBT Console Properties", "") {
 
-  override val javaVMArguments = {
+  val javaVMArguments = {
 
     val defaultArguments =
       "-Xmx512M" +

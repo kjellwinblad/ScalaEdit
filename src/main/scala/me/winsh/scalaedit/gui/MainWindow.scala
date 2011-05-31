@@ -37,7 +37,7 @@ import java.awt.Toolkit
 
 class MainWindow extends Frame {
 
-  val version = "0.2.1"
+  val version = "0.2.3"
 
   title = "ScalaEdit (" + version + ")"
 

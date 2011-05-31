@@ -120,8 +120,7 @@ abstract class EditorsPanel extends TabbedPane {
     currentEditorPanel.foreach(_.fileBuffer.file.foreach(ProjectsPanel().selectFile(_)))
   }
 
-  reactions += {
-    case MousePressed(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
+	 def handleClick(point:Point, triggersPopup:Boolean){
       val editorPanel = currentEditorPanel.get
       //Display popup
       (new PopupMenu() {
@@ -150,6 +149,14 @@ abstract class EditorsPanel extends TabbedPane {
           def apply = shutDownAllOpenResources(true)
         }))
       }).peer.show(this.peer, point.x, point.y)
+		}
+
+  reactions += {
+    case MousePressed(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
+			handleClick(point, triggersPopup)
+    }
+    case MouseReleased(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
+			handleClick(point, triggersPopup)
     }
   }
 

@@ -66,9 +66,8 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     listenTo(mouse.clicks)
 
-    reactions += {
-      case MousePressed(_, point, _, _, triggersPopup) => {
-        val path = peer.getClosestPathForLocation(point.x, point.y)
+		def handleClick(point:Point, triggersPopup:Boolean){
+			  val path = peer.getClosestPathForLocation(point.x, point.y)
         if (peer.getPathBounds(path).contains(point)) {
           tree.peer.setSelectionPath(path)
           if (triggersPopup) {
@@ -85,6 +84,15 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
             }
           }
         }
+		}
+    	var mousePressedTriggeredPopup = false
+			
+    reactions += {
+      case MousePressed(_, point, _, _, triggersPopup) => {
+				mousePressedTriggeredPopup = triggersPopup
+      }
+      case MouseReleased(_, point, _, _, triggersPopup) => {
+				handleClick(point, triggersPopup || mousePressedTriggeredPopup)
       }
     }
 

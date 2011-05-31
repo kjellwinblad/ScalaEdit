@@ -25,8 +25,6 @@ The value of the arguments propery will be sent to the process. It is optional.
 """ +
       comments) {
 
-  val javaVMArguments = new StringProperty("java_vm_arguments")
-
   val startingDir = {
     val defaultCurrentProjectDir = "CURRENT_PROJECT_DIR"
     val startingDirStringProp = new StringProperty("starting_dir", defaultCurrentProjectDir)

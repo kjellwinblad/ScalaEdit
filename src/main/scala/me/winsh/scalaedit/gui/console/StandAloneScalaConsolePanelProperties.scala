@@ -20,7 +20,7 @@ class StandAloneScalaConsolePanelProperties extends StandAloneConsoleProperties(
   """The java_classpath variable can contain dirs and jar files.
 Use spaces to separate classpath elements.
 """) {
-  override val javaVMArguments = {
+  val javaVMArguments = {
     val defaultValue =
       "-Xmx256M -Xms32M" +
         (if (System.getProperty("os.name").toLowerCase.contains("windows"))
