@@ -37,7 +37,7 @@ import java.awt.Toolkit
 
 class MainWindow extends Frame {
 
-  val version = "0.2.0"
+  val version = "0.2.1"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -219,12 +219,20 @@ colours or behaviour after theme change.""",
 				
 			}
 			*/
-			contents += new Menu("Editor") {
-				contents += new MenuItem(Action("General...") {
-					  val props = new EditorPanelProperties()
-            editorsPanel.addFileEditor(FileBuffer(props.storagePath))
-				})
-			}
+      contents += new Menu("Editor") {
+        contents += new MenuItem(Action("General...") {
+          val props = new EditorPanelProperties()
+          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+        })
+        contents += new MenuItem(Action("Encoding...") {
+          val props = new EncodingProperties()
+          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+        })
+        contents += new MenuItem(Action("Syntax Highlighting...") {
+          val props = new SyntaxHighlightingProperties()
+          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+        })
+      }
       contents += new Menu("Terminal") {
         contents += new MenuItem(new Action("SBT Terminal...") {
 

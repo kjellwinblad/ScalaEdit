@@ -30,10 +30,13 @@ import me.winsh.scalaedit.gui._
 import javax.swing.text.BadLocationException
 import scala.util.matching._
 import javax.swing.KeyStroke
+import java.awt.Font
 
 class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) extends BorderPanel with Closeable {
 
-	private val properties = new EditorPanelProperties()
+  private val properties = new EditorPanelProperties()
+
+  private val colorProperties = new SyntaxHighlightingProperties()
 
   private var savedVar = true
   private val saveAsIcon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
@@ -57,6 +60,13 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   }
 
   val editorPane = new RSyntaxTextArea() {
+
+    setSyntaxScheme(colorProperties.schemeFromProps(properties.font))
+
+    setForeground(properties.defaultTextColor.get)
+
+    setBackground(properties.backgroundColor.get)
+
     override protected def createPopupMenu() = (new PopupMenu() {
       add(new MenuItem(cutAction))
       add(new MenuItem(copyAction))
@@ -132,13 +142,13 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     //add(copyAction)
     //add(pasteAction)
     add(new JToolBar.Separator)
-    add(new ToggleButton() { 
-    	action = wrapLinesAction
-    	if(properties.wrapLines.get){
-    		selected = true
-    		wrapLinesAction()
-    	}else selected = false
-    	
+    add(new ToggleButton() {
+      action = wrapLinesAction
+      if (properties.wrapLines.get) {
+        selected = true
+        wrapLinesAction()
+      } else selected = false
+
     })
   }
 
@@ -150,11 +160,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     val car = editorPane.getCaret().asInstanceOf[DefaultCaret]
     val policy = car.getUpdatePolicy()
     car.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
-    editorPane.setText(fileBuffer.content)
+    val content = fileBuffer.content
+    editorPane.setText(content)
     car.setUpdatePolicy(policy)
   } catch {
-    case _ => {
-      Dialog.showMessage(message = "This may not be a text file.", title = "Could Not Read File")
+    case e => {
+      Dialog.showMessage(message = "Error when loading file:\n" +
+        "Error: " + e.getMessage,
+        title = "Could Not Read File")
       editorPane.setEnabled(false)
     }
   }
@@ -176,7 +189,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
             fileBuffer.content = editorPane.getText
             saved = true
           } catch {
-            case _ => Dialog.showMessage(message = "The file might be write protected.", title = "Could Not Save File")
+            case e => Dialog.showMessage(message = "Error when trying to save file.\nError: %s".format(e.getMessage), title = "Could Not Save File")
           }
         }
         case None => {

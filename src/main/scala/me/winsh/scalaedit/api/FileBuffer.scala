@@ -9,7 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 package me.winsh.scalaedit.api
-import java.io.File
+import java.io.{ File, FileOutputStream, OutputStreamWriter, BufferedWriter }
 import scala.io.Source
 
 abstract class FileBuffer(var file: Option[File]) {
@@ -35,19 +35,23 @@ abstract class FileBuffer(var file: Option[File]) {
     case Some(f) => {
       var src: Source = null
       try {
-
-        src = Source.fromFile(f)
+        val encProps = new EncodingProperties()
+        src = Source.fromFile(f, encProps.encoding)
         val cont = src.getLines.mkString("\n")
         cont
 
-      } finally { src.close() }
+      } finally { try { src.close() } catch { case _ => } }
     }
   }
 
   def content_=(newContent: String) = file match {
     case None => throw new Exception("Content can not be saved to this file buffer since it is not connected to a file in the file system")
     case Some(f) => {
-      val out = new java.io.FileWriter(f)
+      val encProps = new EncodingProperties()
+      val enc: String = encProps.encoding
+
+      val out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), enc))
+
       out.write(newContent)
       out.close
     }
@@ -85,4 +89,5 @@ object FileBuffer {
   def apply(): FileBuffer = new FileBufferImpl(None)
 
   def apply(file: File): FileBuffer = new FileBufferImpl(Some(file))
+
 }

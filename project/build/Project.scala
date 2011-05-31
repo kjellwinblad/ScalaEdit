@@ -5,12 +5,17 @@ import de.element34.sbteclipsify._
 import assembly._
 import com.github.olim7t.sbtscalariform._
 
-class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify  with AssemblyBuilder with ScalariformPlugin{
+class ScalaEditProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify  with AssemblyBuilder with ScalariformPlugin with ColorPropertiesGenerator{
   lazy val projectScalaVersion = "2.9.0"
   lazy val mainJar = "target/scala_" + projectScalaVersion + "/" +
     projectName.value + "_" + projectScalaVersion + "-" + projectVersion.value + ".jar"
   lazy val dependencyJars = new File("lib").listFiles.filter(_.getName.endsWith(".jar")).map(_.getAbsolutePath)
   override lazy val mainClass = Some("me.winsh.scalaedit.Main")
+
+	lazy val generateColorProperties = task {
+		generateColorPropertiesFunc()
+		None
+	}
 
   /**
    * Run the program as a stand alone application

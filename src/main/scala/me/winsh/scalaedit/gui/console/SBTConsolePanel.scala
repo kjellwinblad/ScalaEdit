@@ -42,12 +42,10 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
   val consoleType = SBTConsole
 
-	
-
   private class SBTProcess extends InOutSource {
 
-		private val properties = new SBTConsolePanelProperties()
-		
+    private val properties = new SBTConsolePanelProperties()
+
     val process = {
       //Check if SBT is in properties dir
 
@@ -85,16 +83,11 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
         }
 
-        val classPath = System.getProperty("java.class.path")
-
-        
         echoInput = properties.echoInput.get
-
-        
 
         val args: java.util.List[String] =
           javaPath ::
-            properties.javaVMArguments.get.split(" ").toList :::
+            properties.javaVMArguments.get.split("""\s""").toList.filter(_.size > 0) :::
             "-cp" ::
             sbtJarFile.getAbsolutePath ::
             "xsbt.boot.Boot" ::

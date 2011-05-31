@@ -51,7 +51,7 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 
     val process = {
 
-			val properties = new StandAloneScalaConsolePanelProperties()
+      val properties = new StandAloneScalaConsolePanelProperties()
 
       try {
 
@@ -62,23 +62,24 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
           case false => "java"
         }
 
-        val classPath = System.getProperty("java.class.path")
+        val standardClassPath = System.getProperty("java.class.path")
 
+        def propCPStringToCPString(s: String) = s.split("""\s|:""").filter(_.size > 0).map(_.trim).mkString(":")
+
+        val classPath = (standardClassPath +
+          (if (properties.javaClasspath.get.trim == "") "" else ":" + propCPStringToCPString(properties.javaClasspath.get)))
 
         echoInput = properties.echoInput.get
 
-				def propCPStringToCPString(s:String) = s.split("""\s""").filter(_.size>0).map(_.trim).mkString(":")
-
         val args: java.util.List[String] =
           javaPath ::
-            properties.javaVMArguments.get.split("""\s""").toList :::
+            properties.javaVMArguments.get.split("""\s""").toList.filter(_.size > 0) :::
             "-cp" ::
-            (classPath +
-              (if (properties.javaClasspath.get == "") "" else ":" + propCPStringToCPString(properties.javaClasspath.get))) ::
-              "scala.tools.nsc.MainGenericRunner" ::
-              "-usejavacp" ::
-              (if (properties.arguments.get.size == 0) List[String]()
-              else properties.arguments.get.split(" ").toList) ::: Nil
+            classPath ::
+            "scala.tools.nsc.MainGenericRunner" ::
+            "-usejavacp" ::
+            (if (properties.arguments.get.size == 0) List[String]()
+            else properties.arguments.get.split(" ").toList) ::: Nil
 
         val pb =
           new ProcessBuilder(args)

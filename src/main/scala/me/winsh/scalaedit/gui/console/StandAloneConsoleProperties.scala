@@ -28,22 +28,22 @@ The value of the arguments propery will be sent to the process. It is optional.
   val javaVMArguments = new StringProperty("java_vm_arguments")
 
   val startingDir = {
-  	val defaultCurrentProjectDir = "CURRENT_PROJECT_DIR"
-  	val startingDirStringProp = new StringProperty("starting_dir", defaultCurrentProjectDir)
+    val defaultCurrentProjectDir = "CURRENT_PROJECT_DIR"
+    val startingDirStringProp = new StringProperty("starting_dir", defaultCurrentProjectDir)
 
-  	new Property[File]("", new File(".")){
-  		def get = 
-  			if(startingDirStringProp.get.trim == defaultCurrentProjectDir) Utils.projectDir
-  			else new File(startingDirStringProp.get) 
-  				
-  		def set(value:File){
-  			startingDirStringProp.set(value.getCanonicalPath)
-  		}
-  	}
+    new Property[File]("", new File(".")) {
+      def get =
+        if (startingDirStringProp.get.trim == defaultCurrentProjectDir) Utils.projectDir
+        else new File(startingDirStringProp.get)
+
+      def set(value: File) {
+        startingDirStringProp.set(value.getCanonicalPath)
+      }
+    }
   }
-  
+
   val arguments = new StringProperty("arguments")
 
-  val echoInput = new BooleanProperty("echo_input", 
-  	System.getProperty("os.name").toLowerCase.contains("windows"))
+  val echoInput = new BooleanProperty("echo_input",
+    System.getProperty("os.name").toLowerCase.contains("windows"))
 }

@@ -18,16 +18,16 @@ class SBTConsolePanelProperties extends StandAloneConsoleProperties(
   new File(Utils.propertiesDir, "sbt_console.properties"),
   "SBT Console Properties", "") {
 
-	override val javaVMArguments = {
+  override val javaVMArguments = {
 
-		val defaultArguments =
-			"-Xmx512M" +
-		    (if (System.getProperty("os.name").toLowerCase.contains("windows"))
-		      " -Djline.terminal=jline.UnsupportedTerminal"
-		    else
-		      "")
-		
-		new StringProperty("java_vm_arguments", defaultArguments)
-	}
+    val defaultArguments =
+      "-Xmx512M" +
+        (if (System.getProperty("os.name").toLowerCase.contains("windows"))
+          " -Djline.terminal=jline.UnsupportedTerminal"
+        else
+          "")
+
+    new StringProperty("java_vm_arguments", defaultArguments)
+  }
 
 }

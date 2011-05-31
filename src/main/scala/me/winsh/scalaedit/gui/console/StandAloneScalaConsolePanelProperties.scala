@@ -21,15 +21,15 @@ class StandAloneScalaConsolePanelProperties extends StandAloneConsoleProperties(
 Use spaces to separate classpath elements.
 """) {
   override val javaVMArguments = {
-  	val defaultValue = 
-	  	"-Xmx256M -Xms32M" +
-	    (if (System.getProperty("os.name").toLowerCase.contains("windows"))
-	      " -Djline.terminal=NONE"
-	    else
-	      "")
-		new StringProperty("java_vm_arguments", defaultValue)
+    val defaultValue =
+      "-Xmx256M -Xms32M" +
+        (if (System.getProperty("os.name").toLowerCase.contains("windows"))
+          " -Djline.terminal=NONE"
+        else
+          "")
+    new StringProperty("java_vm_arguments", defaultValue)
   }
 
-	val javaClasspath = new StringProperty("java_classpath")
+  val javaClasspath = new StringProperty("java_classpath")
 
 }

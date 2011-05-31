@@ -22,7 +22,6 @@ class ThemeProperties
 This properties file is modified from the user interface.
 """) {
 
-  val theme =  new StringProperty("theme_class_name", UIManager.getLookAndFeel().getClass().getName())
-
+  val theme = new StringProperty("theme_class_name", UIManager.getLookAndFeel().getClass().getName())
 
 }

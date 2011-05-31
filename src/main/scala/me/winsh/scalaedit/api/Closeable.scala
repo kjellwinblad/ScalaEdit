@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 package me.winsh.scalaedit.api
 
 trait Closeable {
- 
+
   def close(): Boolean
 
 }
