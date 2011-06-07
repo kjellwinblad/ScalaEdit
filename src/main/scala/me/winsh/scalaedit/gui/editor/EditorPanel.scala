@@ -67,13 +67,13 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     setBackground(properties.backgroundColor.get)
 
-		setCurrentLineHighlightColor(properties.currentLineColor.get)
+    setCurrentLineHighlightColor(properties.currentLineColor.get)
 
-		setSelectionColor(properties.selectionColor.get)
+    setSelectionColor(properties.selectionColor.get)
 
-		setHighlightCurrentLine(properties.currentLineColorEnabled.get)
+    setHighlightCurrentLine(properties.currentLineColorEnabled.get)
 
-		setCaretColor(properties.caretColor.get)
+    setCaretColor(properties.caretColor.get)
 
     override protected def createPopupMenu() = (new PopupMenu() {
       add(new MenuItem(cutAction))
@@ -336,12 +336,12 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     var focusComponent: Component = null
 
-		val replaceField: TextField = new TextField(20)
+    val replaceField: TextField = new TextField(20)
 
     val replace = new Action("Replace") {
       mnemonic = KeyEvent.VK_P
-      def apply() = if(editorPane.getSelectedText != null && editorPane.getSelectedText.size != 0){
-      	editorPane.replaceSelection(replaceField.text)
+      def apply() = if (editorPane.getSelectedText != null && editorPane.getSelectedText.size != 0) {
+        editorPane.replaceSelection(replaceField.text)
       }
     }
 
@@ -355,7 +355,6 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     }
 
     replaceField.action = replaceAndFind
-
 
     case class FindInfo(find: String, replace: String, forward: Boolean, sensitive: Boolean)
 
@@ -380,7 +379,8 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
         val found = SearchEngine.find(editorPane, info.find, info.forward, true, false, true)
 
         if (!found) {
-          infoLabel.text = """<html><font color="RED"><b>End reached!</b></font>"""
+          infoLabel.text = """<html><font color="RED"><b>End reached!</b></font> (Starting from beginning)"""
+          editorPane.setCaretPosition(0)
         }
       }
     }
