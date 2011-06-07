@@ -37,7 +37,7 @@ import java.awt.Toolkit
 
 class MainWindow extends Frame {
 
-  val version = "0.2.3"
+  val version = "0.2.4"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -45,9 +45,9 @@ class MainWindow extends Frame {
 
   val consolesPanel = new ConsolesPanel()
 
-  val editorsPanel = EditorsPanel()
+  val projectPanel = new ProjectPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
 
-  val projectsPanel = ProjectsPanel((f: File) => editorsPanel.addFileEditor(FileBuffer(f)))
+  val editorsPanel: EditorsPanel = EditorsPanel(projectPanel)
 
   peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
 
@@ -130,7 +130,7 @@ class MainWindow extends Frame {
           icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
 
           def apply() {
-            projectsPanel.changeRootAction()
+            projectPanel.changeRootAction()
           }
 
         })
@@ -142,7 +142,7 @@ class MainWindow extends Frame {
 
           src.getLines().foreach((path) => {
             contents += new MenuItem(Action(path) {
-              projectsPanel.changeRoot(new File(path))
+              projectPanel.changeRoot(new File(path))
             })
           })
 
@@ -351,7 +351,7 @@ colours or behaviour after theme change.""",
     val editorProjectSplitPane = new SplitPane() {
       resizeWeight = 0.0
       orientation = Orientation.Vertical
-      leftComponent = projectsPanel
+      leftComponent = projectPanel
       rightComponent = editorsPanel
     }
 

@@ -67,6 +67,14 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     setBackground(properties.backgroundColor.get)
 
+		setCurrentLineHighlightColor(properties.currentLineColor.get)
+
+		setSelectionColor(properties.selectionColor.get)
+
+		setHighlightCurrentLine(properties.currentLineColorEnabled.get)
+
+		setCaretColor(properties.caretColor.get)
+
     override protected def createPopupMenu() = (new PopupMenu() {
       add(new MenuItem(cutAction))
       add(new MenuItem(copyAction))
@@ -239,7 +247,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   object undoAction extends Action("Undo") {
 
-    toolTip = "<html>Undo <i>(control+z)</i>"
+    toolTip = "<html>Undo <i>(control+Z)</i>"
 
     icon = Utils.getIcon("/images/small-icons/undo.png")
 
@@ -322,72 +330,90 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   object searchAction extends Action("") {
 
-    toolTip = "<html>Search or Search and Replace <i>(control+f)</i>"
+    toolTip = "<html>Search or Search and Replace <i>(control+F)</i>"
 
     icon = Utils.getIcon("/images/small-icons/find.png")
 
     var focusComponent: Component = null
 
+		val replaceField: TextField = new TextField(20)
+
+    val replace = new Action("Replace") {
+      mnemonic = KeyEvent.VK_P
+      def apply() = if(editorPane.getSelectedText != null && editorPane.getSelectedText.size != 0){
+      	editorPane.replaceSelection(replaceField.text)
+      }
+    }
+
+    val replaceAndFind = new Action("Replace/Find") {
+      mnemonic = KeyEvent.VK_E
+
+      def apply() {
+        replace()
+        find()
+      }
+    }
+
+    replaceField.action = replaceAndFind
+
+
+    case class FindInfo(find: String, replace: String, forward: Boolean, sensitive: Boolean)
+
+    def findInfo = {
+      val forward = forwardSearchCheckBox.selected
+
+      val sensitive = caseSensitiveCheckBox.selected
+
+      val findRegExp = ((if (sensitive) "" else ("(?i)")) + findField.text)
+
+      FindInfo(findRegExp, replaceField.text, forward, sensitive)
+    }
+
+    val find = new Action("Find") {
+
+      mnemonic = KeyEvent.VK_F
+
+      def apply() {
+
+        val info = findInfo
+
+        val found = SearchEngine.find(editorPane, info.find, info.forward, true, false, true)
+
+        if (!found) {
+          infoLabel.text = """<html><font color="RED"><b>End reached!</b></font>"""
+        }
+      }
+    }
+
+    val findField: TextField = new TextField(20) {
+      action = find
+    }
+
+    val caseSensitiveCheckBox = new CheckBox("Match case") {
+      mnemonic = Key.H
+      selected = false
+    }
+
+    val forwardSearchCheckBox = new CheckBox("Forward") {
+      mnemonic = Key.D
+      selected = true
+    }
+
+    val infoLabel = new Label("<html><i>(Tip: Java regexp)</i>")
+
     def apply() {
       editorAndToolArea.setTool(new BoxPanel(Orientation.Vertical) {
-
-        private var resultIterator: Regex.MatchIterator = null
-        private var lastSearchString: Option[String] = None
-        private var currentSelectionSize = 0
-        private var selectionChangeDueToReplacement = 0
-        private val find = new Action("Find") {
-
-          mnemonic = KeyEvent.VK_F
-
-          private def initResultIterator() {
-            currentSelectionSize = 0
-            selectionChangeDueToReplacement = 0
-
-            lastSearchString = Some(findField.text)
-
-            val sensitive = caseSensitiveCheckBox.selected
-
-            val findRegExp = ((if (sensitive) "" else ("(?i)")) + findField.text).r
-
-            resultIterator = findRegExp.findAllIn(editorPane.getText)
-
-          }
-
-          def apply() {
-
-            if (lastSearchString != Some(findField.text))
-              initResultIterator()
-
-            if (!resultIterator.hasNext) {
-              initResultIterator()
-              infoLabel.text = """<html><font color="RED"><b>End reached!</b></font>"""
-            } else {
-              editorPane.select(resultIterator.start + selectionChangeDueToReplacement,
-                resultIterator.end + selectionChangeDueToReplacement)
-              currentSelectionSize = resultIterator.end - resultIterator.start
-              resultIterator.next()
-            }
-          }
-        }
 
         private val close = new Action("Close") {
           mnemonic = KeyEvent.VK_O
           def apply() {
 
             editorAndToolArea.removeTool
-            editorPane.setEditable(true)
             editorPane.requestFocus()
 
           }
         }
-        private val findField: TextField = new TextField(20) {
-          action = find
-        }
 
-        private val caseSensitiveCheckBox = new CheckBox("Case sensitive") {
-          selected = false
-        }
-        private val infoLabel = new Label("<html><i>(Tip: Java regexp)</i>")
         contents += new FlowPanel(FlowPanel.Alignment.Left)() {
 
           contents += findField
@@ -395,62 +421,26 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
           contents += new Button(find)
           contents += new Button(close)
           contents += caseSensitiveCheckBox
+          contents += forwardSearchCheckBox
           contents += infoLabel
 
         }
 
         contents += new FlowPanel(FlowPanel.Alignment.Left)() {
 
-          private val replace = new Action("Replace") {
-            def apply() {
-
-              mnemonic = KeyEvent.VK_P
-
-              if (currentSelectionSize != 0) {
-
-                selectionChangeDueToReplacement = selectionChangeDueToReplacement +
-                  (replaceField.text.size - currentSelectionSize)
-                val selStart = editorPane.getSelectionStart
-                editorPane.replaceSelection(replaceField.text)
-                if (selStart >= 0) {
-                  editorPane.select(selStart, selStart + replaceField.text.size)
-                  currentSelectionSize = replaceField.text.size
-                }
-              }
-            }
-          }
-
-          private val replaceAndFind = new Action("Replace/Find") {
-            mnemonic = KeyEvent.VK_E
-
-            def apply() {
-
-              replace()
-
-              find()
-            }
-          }
-
           private val replaceAll = new Action("Replace All") {
 
             mnemonic = KeyEvent.VK_A
             def apply() {
 
-              val sensitive = caseSensitiveCheckBox.selected
+              val info = findInfo
 
-              val findRegExp = ((if (sensitive) "" else ("(?i)")) + findField.text).r
-
-              val replacedText = findRegExp.replaceAllIn(editorPane.getText, replaceField.text)
-
-              editorPane.setText(replacedText)
+              SearchEngine.replaceAll(editorPane, info.find, info.replace, true, false, true)
 
               close()
             }
           }
 
-          private val replaceField: TextField = new TextField(20) {
-            action = replaceAndFind
-          }
           contents += replaceField
 
           contents += new Button(replace)
@@ -459,17 +449,16 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
         }
 
-      }, Unit => { editorPane.setEditable(true) })
+      }, Unit => Unit)
 
       focusComponent.requestFocus()
-      editorPane.setEditable(false)
 
     }
   }
 
   object gotoLineAction extends Action("") {
 
-    toolTip = "<html>Goto Line <i>(control+l)</i>"
+    toolTip = "<html>Goto Line <i>(control+L)</i>"
 
     var wrapLines = false
 
@@ -524,9 +513,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   editorPane.addFocusListener(new FocusListener() {
     def focusGained(e: FocusEvent) {
-      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK), gotoLineAction.peer)
-      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), saveAction.peer)
-      //editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), searchAction.peer)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK), cutAction.peer)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), copyAction.peer)
+      editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), pasteAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), saveAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), searchAction.peer)
       editorPane.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK), gotoLineAction.peer)

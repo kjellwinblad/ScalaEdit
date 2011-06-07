@@ -27,7 +27,7 @@ import java.io.FileWriter
 
 class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel {
 
-  val autorefreshIntervallSeconds = 5
+  val properties = new ProjectPanelProperties()
 
   var tree = new ProjectTree(Utils.projectDir)
 
@@ -66,33 +66,33 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     listenTo(mouse.clicks)
 
-		def handleClick(point:Point, triggersPopup:Boolean){
-			  val path = peer.getClosestPathForLocation(point.x, point.y)
-        if (peer.getPathBounds(path).contains(point)) {
-          tree.peer.setSelectionPath(path)
-          if (triggersPopup) {
-            popupMenu.show(peer, point.x, point.y)
-          } else {
-            val file = path.getLastPathComponent().asInstanceOf[File]
-            file match {
-              case f: File if (!f.isDirectory) => {
-                fileSelectionHandler(f)
-                Utils.bestFileChooserDir = f.getParentFile
-              }
-              case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
-              case _ => Unit
+    def handleClick(point: Point, triggersPopup: Boolean) {
+      val path = peer.getClosestPathForLocation(point.x, point.y)
+      if (peer.getPathBounds(path).contains(point)) {
+        tree.peer.setSelectionPath(path)
+        if (triggersPopup) {
+          popupMenu.show(peer, point.x, point.y)
+        } else {
+          val file = path.getLastPathComponent().asInstanceOf[File]
+          file match {
+            case f: File if (!f.isDirectory) => {
+              fileSelectionHandler(f)
+              Utils.bestFileChooserDir = f.getParentFile
             }
+            case f: File if (f.isDirectory) => Utils.bestFileChooserDir = f
+            case _ => Unit
           }
         }
-		}
-    	var mousePressedTriggeredPopup = false
-			
+      }
+    }
+    var mousePressedTriggeredPopup = false
+
     reactions += {
       case MousePressed(_, point, _, _, triggersPopup) => {
-				mousePressedTriggeredPopup = triggersPopup
+        mousePressedTriggeredPopup = triggersPopup
       }
       case MouseReleased(_, point, _, _, triggersPopup) => {
-				handleClick(point, triggersPopup || mousePressedTriggeredPopup)
+        handleClick(point, triggersPopup || mousePressedTriggeredPopup)
       }
     }
 
@@ -216,7 +216,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
       }))
       add(new CheckMenuItem("") {
         selected = false
-        action = new Action("Auto Refresh (" + autorefreshIntervallSeconds + " sec)") {
+        action = new Action("Auto Refresh") {
           icon = Utils.getIcon("/images/small-icons/find.png")
           def apply() {
             if (selected)
@@ -294,7 +294,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
         while (autoRefreshRunning.get) {
           try {
-            Thread.sleep(autorefreshIntervallSeconds * 1000)
+            Thread.sleep(properties.autoRefreshDelayInSeconds.get * 1000)
             Utils.swingInvokeAndWait(() => refreshAction())
           } catch { case _ => autoRefreshRunning.set(false) }
         }

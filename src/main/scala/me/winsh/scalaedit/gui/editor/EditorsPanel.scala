@@ -22,6 +22,8 @@ import java.io.File
 
 abstract class EditorsPanel extends TabbedPane {
 
+  val projectPanel: Option[ProjectPanel] = None
+
   val bufferToEditorMap = HashMap[FileBuffer, EditorPanel]()
 
   tabLayoutPolicy = TabbedPane.Layout.Scroll
@@ -117,46 +119,46 @@ abstract class EditorsPanel extends TabbedPane {
   }
 
   def openSelectedInProjectBrowser() {
-    currentEditorPanel.foreach(_.fileBuffer.file.foreach(ProjectsPanel().selectFile(_)))
+    currentEditorPanel.foreach(_.fileBuffer.file.foreach((f) => projectPanel.foreach(_.selectFile(f))))
   }
 
-	 def handleClick(point:Point, triggersPopup:Boolean){
-      val editorPanel = currentEditorPanel.get
-      //Display popup
-      (new PopupMenu() {
-        add(new MenuItem(new Action("Select in Project Browser") {
-          icon = Utils.getIcon("/images/small-icons/go-up.png")
-          def apply = openSelectedInProjectBrowser()
-        }))
-        editorPanel.fileBuffer.file.foreach((file) => {
-          def nicifyPath(p: String) =
-            if (p.size <= 50) p
-            else "..." + p.takeRight(47)
-          addSeparator()
-          add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())) {
-            tooltip = file.getCanonicalPath()
-            icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
-            def apply = Utils.clipboardContents = file.getCanonicalPath()
-          }))
-        })
+  def handleClick(point: Point, triggersPopup: Boolean) {
+    val editorPanel = currentEditorPanel.get
+    //Display popup
+    (new PopupMenu() {
+      add(new MenuItem(new Action("Select in Project Browser") {
+        icon = Utils.getIcon("/images/small-icons/go-up.png")
+        def apply = openSelectedInProjectBrowser()
+      }))
+      editorPanel.fileBuffer.file.foreach((file) => {
+        def nicifyPath(p: String) =
+          if (p.size <= 50) p
+          else "..." + p.takeRight(47)
         addSeparator()
-        add(new MenuItem(new Action("Close All") {
-          icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
-          def apply = shutDownAllOpenResources()
+        add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())) {
+          tooltip = file.getCanonicalPath()
+          icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
+          def apply = Utils.clipboardContents = file.getCanonicalPath()
         }))
-        add(new MenuItem(new Action("Close All Except This") {
-          icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
-          def apply = shutDownAllOpenResources(true)
-        }))
-      }).peer.show(this.peer, point.x, point.y)
-		}
+      })
+      addSeparator()
+      add(new MenuItem(new Action("Close All") {
+        icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+        def apply = shutDownAllOpenResources()
+      }))
+      add(new MenuItem(new Action("Close All Except This") {
+        icon = Utils.getIcon("/images/small-icons/actions/fileclose.png")
+        def apply = shutDownAllOpenResources(true)
+      }))
+    }).peer.show(this.peer, point.x, point.y)
+  }
 
   reactions += {
     case MousePressed(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
-			handleClick(point, triggersPopup)
+      handleClick(point, triggersPopup)
     }
     case MouseReleased(_, point, _, _, triggersPopup) if (triggersPopup && editorPanelSelected) => {
-			handleClick(point, triggersPopup)
+      handleClick(point, triggersPopup)
     }
   }
 
@@ -191,7 +193,20 @@ abstract class EditorsPanel extends TabbedPane {
 
 object EditorsPanel {
 
-  private val editorsPanel = new EditorsPanel() {}
+  private var editorsPanel = null: EditorsPanel
 
-  def apply(): EditorsPanel = editorsPanel
+  def apply(): EditorsPanel =
+    if (editorsPanel == null) {
+      editorsPanel = new EditorsPanel() {}
+      editorsPanel
+    } else editorsPanel
+
+  def apply(p: ProjectPanel): EditorsPanel =
+    if (editorsPanel == null) {
+      editorsPanel = new EditorsPanel() {
+        override val projectPanel = Some(p)
+      }
+      editorsPanel
+    } else editorsPanel
+
 }

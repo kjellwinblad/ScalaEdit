@@ -48,7 +48,7 @@ object Main {
           if (shutDownOpenResources()) {
             visible = false
             dispose()
-            Thread.sleep(500)
+            Thread.sleep(800)
             sys.exit()
           }
         })

@@ -40,6 +40,14 @@ Available fonts: %s
 
   val defaultTextColor = new ColorProperty("foreground_color", textArea.getForeground)
 
+  val currentLineColorEnabled = new BooleanProperty("current_line_color_enabled", textArea.getHighlightCurrentLine)
+
+  val currentLineColor = new ColorProperty("current_line_color", textArea.getCurrentLineHighlightColor)
+
+  val selectionColor = new ColorProperty("selection_color", textArea.getSelectionColor)
+
+  val caretColor = new ColorProperty("caret_color", textArea.getCaretColor)
+
   val textSize = new IntProperty("text_size", textArea.getFont.getSize)
 
   val fontName = new StringProperty("font_name", textArea.getFont.getName)
