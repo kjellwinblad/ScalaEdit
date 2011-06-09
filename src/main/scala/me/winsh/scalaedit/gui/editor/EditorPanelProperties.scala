@@ -30,23 +30,7 @@ Available fonts: %s
 
   val wrapLines = new BooleanProperty("wrap_lines", false)
 
-  val errorLineColor = new ColorProperty("error_line_color", new Color(1.0f, 0.0f, 0.0f, 0.35f))
-
-  val warningLineColor = new ColorProperty("warning_line_color", new Color(1.0f, 1.0f, 0.0f, 0.9f))
-
   private val textArea = new RSyntaxTextArea(20, 60)
-
-  val backgroundColor = new ColorProperty("background_color", textArea.getBackground)
-
-  val defaultTextColor = new ColorProperty("foreground_color", textArea.getForeground)
-
-  val currentLineColorEnabled = new BooleanProperty("current_line_color_enabled", textArea.getHighlightCurrentLine)
-
-  val currentLineColor = new ColorProperty("current_line_color", textArea.getCurrentLineHighlightColor)
-
-  val selectionColor = new ColorProperty("selection_color", textArea.getSelectionColor)
-
-  val caretColor = new ColorProperty("caret_color", textArea.getCaretColor)
 
   val textSize = new IntProperty("text_size", textArea.getFont.getSize)
 

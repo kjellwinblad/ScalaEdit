@@ -68,10 +68,12 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     def handleClick(point: Point, triggersPopup: Boolean) {
       val path = peer.getClosestPathForLocation(point.x, point.y)
+
       if (peer.getPathBounds(path).contains(point)) {
+
         tree.peer.setSelectionPath(path)
         if (triggersPopup) {
-          popupMenu.show(peer, point.x, point.y)
+          fileClickPopupMenu.show(peer, point.x, point.y)
         } else {
           val file = path.getLastPathComponent().asInstanceOf[File]
           file match {
@@ -83,7 +85,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
             case _ => Unit
           }
         }
-      }
+      } else if (triggersPopup) noFileClickPopupMenu.show(peer, point.x, point.y)
     }
     var mousePressedTriggeredPopup = false
 
@@ -118,7 +120,11 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     def selectedPath = peer.getSelectionPath()
 
-    val popupMenu = (new PopupMenu() {
+    val noFileClickPopupMenu = (new PopupMenu() {
+      projectMenuItems.foreach(add(_))
+    }).peer
+
+    def fileClickPopupMenu = (new PopupMenu() {
 
       def selectedOrRoot = {
         val selFile = if (!selection.empty)
@@ -206,26 +212,8 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
       addSeparator()
 
-      add(new MenuItem(new Action("Change Root...") {
-        icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
-        def apply() = changeRootAction()
-      }))
-      add(new MenuItem(new Action("Refresh") {
-        icon = Utils.getIcon("/images/small-icons/find.png")
-        def apply() = refreshAction()
-      }))
-      add(new CheckMenuItem("") {
-        selected = false
-        action = new Action("Auto Refresh") {
-          icon = Utils.getIcon("/images/small-icons/find.png")
-          def apply() {
-            if (selected)
-              startAutoRefresh()
-            else
-              stopAutoRefresh()
-          }
-        }
-      })
+      projectMenuItems.foreach(add(_))
+
     }).peer
 
     //this.peer.setComponentPopupMenu(popupMenu)
@@ -246,6 +234,30 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     }
   }
 
+  private object RecentlyOpenedRootsHandler {
+    private val recentProjectRootsStore = new File(Utils.propertiesDir, "recently_opened_project_dirs.list")
+
+    def saveNewRoot(newRootPath: String) {
+
+      val recentPaths =
+        (newRootPath :: latestRoots.toList).distinct.take(6)
+
+      val writer = new FileWriter(recentProjectRootsStore)
+      recentPaths.foreach((path) => writer.write(path + "\n"))
+      writer.close()
+
+    }
+
+    def latestRoots: List[String] = try {
+      val src = Source.fromFile(recentProjectRootsStore)
+      val list = src.getLines().toList
+      src.close()
+      list
+    } catch {
+      case _ => Nil
+    }
+  }
+
   def changeRoot(root: File) {
 
     root.mkdirs()
@@ -257,20 +269,10 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     scrollPane.contents = tree
 
-    val recentProjectRootsStore = new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs")
+    RecentlyOpenedRootsHandler.saveNewRoot(root.getCanonicalPath)
 
-    val recentPaths = try {
-      val source = Source.fromFile(recentProjectRootsStore)
-      (root.getCanonicalPath :: source.getLines().toList).distinct.take(6)
-    } catch {
-      case _ => List(root.getCanonicalPath)
-    }
-
-    val writer = new FileWriter(recentProjectRootsStore)
-
-    recentPaths.foreach((path) => writer.write(path + "\n"))
-
-    writer.close()
+    if (properties.autoRefreshEnabled.get)
+      startAutoRefresh()
 
   }
 
@@ -284,10 +286,10 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
     tree.peer.setSelectionPath(selection)
   }
 
-  val autoRefreshRunning = new AtomicBoolean(false)
+  lazy val autoRefreshRunning = new AtomicBoolean(false)
   def startAutoRefresh() = synchronized {
     if (!autoRefreshRunning.get) {
-
+      properties.autoRefreshEnabled.set(true)
       autoRefreshRunning.set(true)
 
       Utils.runInNewThread(() => {
@@ -304,8 +306,38 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
   }
 
   def stopAutoRefresh() {
+    properties.autoRefreshEnabled.set(false)
     autoRefreshRunning.set(false)
   }
+
+  def projectMenuItems =
+    (new MenuItem(new Action("Change Root...") {
+      icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
+      def apply() = changeRootAction()
+    })) ::
+      (new Separator()) ::
+      (new MenuItem(new Action("Refresh") {
+        icon = Utils.getIcon("/images/small-icons/find.png")
+        def apply() = refreshAction()
+      })) ::
+      (new CheckMenuItem("") {
+        selected = properties.autoRefreshEnabled.get
+        action = new Action("Auto Refresh") {
+          icon = Utils.getIcon("/images/small-icons/find.png")
+          def apply() {
+            if (selected)
+              startAutoRefresh()
+            else
+              stopAutoRefresh()
+          }
+        }
+      }) :: Nil
+
+  def projectMenuItemsAndLatestRoots =
+    projectMenuItems ::: ((new Separator()) ::
+      RecentlyOpenedRootsHandler.latestRoots.map((r) => new MenuItem(Action(r) {
+        changeRoot(new File(r))
+      })))
 
   def selectFile(file: File) {
 

@@ -8,16 +8,16 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-package me.winsh.scalaedit.gui
+package me.winsh.scalaedit.gui.project
 
-import scala.swing._
-import javax.swing._
+import me.winsh.scalaedit.api._
+import java.io.File
+import me.winsh.scalaedit.gui.Utils
 
-class PopupMenu extends Component {
-  override lazy val peer: JPopupMenu = new JPopupMenu
+class ProjectPanelColorProperties
+  extends PropertiesFile(new File(Utils.propertiesDir, "project_panel_color.properties"),
+    "Project Panel Color Properties") {
 
-  def add(item: Component): Unit = { peer.add(item.peer) }
-  def addSeparator(): Unit = { peer.addSeparator() }
-  def setVisible(visible: Boolean): Unit = { peer.setVisible(visible) }
+  //TODO: Implement this
 
 }

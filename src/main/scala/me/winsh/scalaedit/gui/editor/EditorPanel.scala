@@ -36,7 +36,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   private val properties = new EditorPanelProperties()
 
-  private val colorProperties = new SyntaxHighlightingProperties()
+  private val colorProperties = new EditorPanelStandardColorsProperties()
+
+  private val syntaxProperties = new SyntaxHighlightingProperties()
 
   private var savedVar = true
   private val saveAsIcon = Utils.getIcon("/images/small-icons/actions/filesaveas.png")
@@ -61,19 +63,19 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
   val editorPane = new RSyntaxTextArea() {
 
-    setSyntaxScheme(colorProperties.schemeFromProps(properties.font))
+    setSyntaxScheme(syntaxProperties.schemeFromProps(properties.font))
 
-    setForeground(properties.defaultTextColor.get)
+    setForeground(colorProperties.defaultTextColor.get)
 
-    setBackground(properties.backgroundColor.get)
+    setBackground(colorProperties.backgroundColor.get)
 
-    setCurrentLineHighlightColor(properties.currentLineColor.get)
+    setCurrentLineHighlightColor(colorProperties.currentLineColor.get)
 
-    setSelectionColor(properties.selectionColor.get)
+    setSelectionColor(colorProperties.selectionColor.get)
 
-    setHighlightCurrentLine(properties.currentLineColorEnabled.get)
+    setHighlightCurrentLine(colorProperties.currentLineColorEnabled.get)
 
-    setCaretColor(properties.caretColor.get)
+    setCaretColor(colorProperties.caretColor.get)
 
     override protected def createPopupMenu() = (new PopupMenu() {
       add(new MenuItem(cutAction))
@@ -334,7 +336,7 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
     icon = Utils.getIcon("/images/small-icons/find.png")
 
-    var focusComponent: Component = null
+    var focusComponent: TextField = null
 
     val replaceField: TextField = new TextField(20)
 
@@ -451,8 +453,9 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
 
       }, Unit => Unit)
 
+      EditorPanel.this.peer.revalidate()
       focusComponent.requestFocus()
-
+      focusComponent.selectAll
     }
   }
 
@@ -546,8 +549,8 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
   } else true
 
   def notifyAboutCodeInfo(notification: CodeNotification): Unit = notification match {
-    case Error(_, line, _) => editorPane.addLineHighlight(line - 1, properties.errorLineColor.get)
-    case Warning(_, line, _) => editorPane.addLineHighlight(line - 1, properties.warningLineColor.get)
+    case Error(_, line, _) => editorPane.addLineHighlight(line - 1, colorProperties.errorLineColor.get)
+    case Warning(_, line, _) => editorPane.addLineHighlight(line - 1, colorProperties.warningLineColor.get)
   }
 
   def notifyAboutClearCodeInfo() {

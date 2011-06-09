@@ -125,33 +125,7 @@ class MainWindow extends Frame {
 
       def prepareMenu() {
         contents.clear()
-        contents += new MenuItem(new Action("Change Project Root...") {
-
-          icon = Utils.getIcon("/images/small-icons/mimetypes/source_moc.png")
-
-          def apply() {
-            projectPanel.changeRootAction()
-          }
-
-        })
-
-        val recentPathItems = try {
-          val src = Source.fromFile(new File(Utils.propertiesDir, ".recentlyOpenedProjectDirs"))
-
-          contents += new Separator()
-
-          src.getLines().foreach((path) => {
-            contents += new MenuItem(Action(path) {
-              projectPanel.changeRoot(new File(path))
-            })
-          })
-
-          src.close()
-        } catch {
-          case _ =>
-        }
-
-        //revalidate()
+        projectPanel.projectMenuItemsAndLatestRoots.foreach(contents += _)
       }
 
     }
@@ -183,45 +157,14 @@ class MainWindow extends Frame {
     }
 
     val propertiesMenu = new Menu("Properties") {
-      /*
-			contents += new Menu("Theme") {
-				val lookAndFeels = UIManager.getInstalledLookAndFeels
 
-					val items = for(lookAndFeel <- lookAndFeels) yield {
-						new RadioMenuItem(lookAndFeel.getName){
-
-							selected = (lookAndFeel.getClassName==UIManager.getLookAndFeel().getClass().getName())
-							
-							action = Action(lookAndFeel.getName){
-              	UIManager.setLookAndFeel(lookAndFeel.getClassName)
-                SwingUtilities.updateComponentTreeUI(MainWindow.this.peer)
-                projectsPanel.changeRoot(Utils.projectDir)
-                MainWindow.this.contents.foreach(_.revalidate())
-
-                Dialog.showMessage(
-          				message = """To reload another theme is known to work badly sometimes.
-You may need to restart ScalaEdit if you experience strange 
-colours or behaviour after theme change.""",
-          				title = "Theme Switch Information")
-
-								
-								
-									
-          			val themeProperties = new ThemeProperties()
-          			themeProperties.theme = lookAndFeel.getClassName
-							}
-						}
-					}
-
-					items.foreach(contents += _)		
-
-					val group = new ButtonGroup(items:_*)
-				
-			}
-			*/
       contents += new Menu("Editor") {
         contents += new MenuItem(Action("General...") {
           val props = new EditorPanelProperties()
+          editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+        })
+        contents += new MenuItem(Action("Colors...") {
+          val props = new EditorPanelStandardColorsProperties()
           editorsPanel.addFileEditor(FileBuffer(props.storagePath))
         })
         contents += new MenuItem(Action("Encoding...") {
@@ -233,6 +176,10 @@ colours or behaviour after theme change.""",
           editorsPanel.addFileEditor(FileBuffer(props.storagePath))
         })
       }
+      contents += new MenuItem(Action("Project Panel...") {
+        val props = new ProjectPanelProperties()
+        editorsPanel.addFileEditor(FileBuffer(props.storagePath))
+      })
       contents += new Menu("Terminal") {
         contents += new MenuItem(new Action("SBT Terminal...") {
 
