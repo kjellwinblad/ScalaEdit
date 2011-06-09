@@ -141,6 +141,7 @@ trait VT320ConsoleBase extends ConsolePanel {
     val inputPanel = new BorderPanel {
 
       val inputArea: TextArea = new TextArea() {
+      	font = new Font("Monospaced", font.getStyle, font.getSize)
         peer.addFocusListener(new FocusListener() {
           def focusGained(e: FocusEvent) {
             peer.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), enterAction.peer)
@@ -165,7 +166,6 @@ trait VT320ConsoleBase extends ConsolePanel {
 
       add(new Button() {
         action = enterAction
-        //preferredSize = new Dimension(450,20)
       }, BorderPanel.Position.East)
     }
     val splitPane = new SplitPane(Orientation.Horizontal, left = scrollPane, right = inputPanel)
