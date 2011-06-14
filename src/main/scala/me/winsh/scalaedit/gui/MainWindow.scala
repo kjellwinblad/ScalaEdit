@@ -34,10 +34,14 @@ import javax.swing.LookAndFeel
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import java.awt.Toolkit
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.HierarchyEvent
+import java.awt.event.HierarchyListener
 
 class MainWindow extends Frame {
 
-  val version = "0.2.4"
+  val version = "0.2.5"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -316,12 +320,13 @@ class MainWindow extends Frame {
 
   contents = mainSplitPane
 
-  mainSplitPane.dividerLocation = 440
-
-  mainSplitPane.editorProjectSplitPane.dividerLocation = 200
-
   pack()
 
   maximize()
 
+  SwingHelper.setDividerLocation(mainSplitPane, 0.72)
+
+  SwingHelper.setDividerLocation(mainSplitPane.editorProjectSplitPane, 0.28)
+
 }
+

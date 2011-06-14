@@ -138,7 +138,7 @@ abstract class EditorsPanel extends TabbedPane {
         add(new MenuItem(new Action("Copy Path: " + nicifyPath(file.getCanonicalPath())) {
           tooltip = file.getCanonicalPath()
           icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
-          def apply = Utils.clipboardContents = file.getCanonicalPath()
+          def apply = SwingHelper.clipboardContents = file.getCanonicalPath()
         }))
       })
       addSeparator()

@@ -206,7 +206,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
         icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
         def apply() = if (!selection.empty) {
           val file = selectedPath.getLastPathComponent().asInstanceOf[File]
-          Utils.clipboardContents = file.getCanonicalPath
+          SwingHelper.clipboardContents = file.getCanonicalPath
         }
       }))
 
@@ -297,7 +297,7 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
         while (autoRefreshRunning.get) {
           try {
             Thread.sleep(properties.autoRefreshDelayInSeconds.get * 1000)
-            Utils.swingInvokeAndWait(() => refreshAction())
+            SwingHelper.invokeAndWait(() => refreshAction())
           } catch { case _ => autoRefreshRunning.set(false) }
         }
 

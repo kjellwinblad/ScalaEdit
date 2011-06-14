@@ -115,19 +115,19 @@ class SBTConsoleWithErrorList extends ConsolePanel {
         add(new MenuItem(new Action("Copy File Path") {
           icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
           def apply() {
-            Utils.clipboardContents = notification.fileName
+            SwingHelper.clipboardContents = notification.fileName
           }
         }))
         add(new MenuItem(new Action("Copy Line Number") {
           icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
           def apply() {
-            Utils.clipboardContents = notification.line.toString
+            SwingHelper.clipboardContents = notification.line.toString
           }
         }))
         add(new MenuItem(new Action("Copy Message") {
           icon = Utils.getIcon("/images/small-icons/copy-to-clipboard.png")
           def apply() {
-            Utils.clipboardContents = notification.message
+            SwingHelper.clipboardContents = notification.message
           }
         }))
       }).peer

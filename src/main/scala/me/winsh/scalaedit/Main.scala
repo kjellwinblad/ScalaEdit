@@ -12,6 +12,7 @@ package me.winsh.scalaedit
 
 import me.winsh.scalaedit.gui.MainWindow
 import me.winsh.scalaedit.gui.Utils
+import me.winsh.scalaedit.gui.SwingHelper
 import me.winsh.scalaedit.gui.ThemeProperties
 import scala.swing._
 import java.awt.Toolkit
@@ -37,14 +38,10 @@ object Main {
     if (splash != null)
       splash.close()
 
-    Utils.swingInvokeLater(() => {
-
-      //val themeProperties = new ThemeProperties()
-
-      //UIManager.setLookAndFeel(themeProperties.theme)
+    SwingHelper.invokeLater(() => {
 
       val window = new MainWindow() {
-        override def closeOperation: Unit = Utils.swingInvokeAndWait(() => {
+        override def closeOperation: Unit = SwingHelper.invokeAndWait(() => {
           if (shutDownOpenResources()) {
             visible = false
             dispose()

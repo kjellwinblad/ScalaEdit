@@ -75,14 +75,14 @@ trait VT320ConsoleBase extends ConsolePanel {
       def apply() {
         val text = terminal.getSelection
         if (text != null)
-          Utils.clipboardContents = text
+          SwingHelper.clipboardContents = text
       }
     }))
     add(new MenuItem(new Action("Paste") {
 
       icon = Utils.getIcon("/images/small-icons/paste-from-clipboard.png")
 
-      def apply() = emulation.write(Utils.clipboardContents.replaceAll("\t", "  ").map(_.toByte).toArray)
+      def apply() = emulation.write(SwingHelper.clipboardContents.replaceAll("\t", "  ").map(_.toByte).toArray)
 
     }))
 
@@ -141,7 +141,7 @@ trait VT320ConsoleBase extends ConsolePanel {
     val inputPanel = new BorderPanel {
 
       val inputArea: TextArea = new TextArea() {
-      	font = new Font("Monospaced", font.getStyle, font.getSize)
+        font = new Font("Monospaced", font.getStyle, font.getSize)
         peer.addFocusListener(new FocusListener() {
           def focusGained(e: FocusEvent) {
             peer.getKeymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), enterAction.peer)
@@ -203,7 +203,7 @@ trait VT320ConsoleBase extends ConsolePanel {
 
         val b = inOutSource.input.read();
 
-        Utils.swingInvokeLater(() => invokeOnConsoleOutput.foreach(func => func(b)))
+        SwingHelper.invokeLater(() => invokeOnConsoleOutput.foreach(func => func(b)))
         //scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
         b match {
           case -1 => running = false
@@ -237,12 +237,12 @@ trait VT320ConsoleBase extends ConsolePanel {
    * puts a string to the terminal and move the input position to the next line
    * @param str
    */
-  def putString(str: String) = Utils.swingInvokeLater(() => {
+  def putString(str: String) = SwingHelper.invokeLater(() => {
     emulation.putString(str)
     scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
   })
 
-  def putStringAndWait(str: String) = Utils.swingInvokeAndWait(() => {
+  def putStringAndWait(str: String) = SwingHelper.invokeAndWait(() => {
     emulation.putString(str)
     scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
   })
