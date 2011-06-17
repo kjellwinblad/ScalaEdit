@@ -19,8 +19,13 @@ import me.winsh.scalaedit.gui._
 import me.winsh.scalaedit.gui.project._
 import scala.collection.mutable.HashMap
 import java.io.File
+import org.fife.ui.autocomplete._
+import me.winsh.scalaedit.api.SCompletionProvider._
 
 abstract class EditorsPanel extends TabbedPane {
+
+val providerJava = createCompeletionProvider(keywordJava)
+val providerScala=createCompeletionProvider(keywordScala)
 
   val projectPanel: Option[ProjectPanel] = None
 
@@ -80,6 +85,13 @@ abstract class EditorsPanel extends TabbedPane {
 
       peer.setSelectedComponent(newEditorPanel.peer)
 
+			buffer.contentType.toLowerCase match {
+	
+				case "text/java" => new AutoCompletion(providerJava).install(newEditorPanel.editorPane)
+				case "text/scala" => new AutoCompletion(providerScala).install(newEditorPanel.editorPane)
+			  case _      =>
+			}
+  
       newEditorPanel
 
     }

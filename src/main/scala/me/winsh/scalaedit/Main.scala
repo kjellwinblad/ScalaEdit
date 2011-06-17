@@ -13,7 +13,6 @@ package me.winsh.scalaedit
 import me.winsh.scalaedit.gui.MainWindow
 import me.winsh.scalaedit.gui.Utils
 import me.winsh.scalaedit.gui.SwingHelper
-import me.winsh.scalaedit.gui.ThemeProperties
 import scala.swing._
 import java.awt.Toolkit
 import javax.swing.UIManager

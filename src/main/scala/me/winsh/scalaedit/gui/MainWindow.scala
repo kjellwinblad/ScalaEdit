@@ -41,7 +41,7 @@ import java.awt.event.HierarchyListener
 
 class MainWindow extends Frame {
 
-  val version = "0.2.5"
+  val version = "0.2.6"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -329,4 +329,3 @@ class MainWindow extends Frame {
   SwingHelper.setDividerLocation(mainSplitPane.editorProjectSplitPane, 0.28)
 
 }
-
