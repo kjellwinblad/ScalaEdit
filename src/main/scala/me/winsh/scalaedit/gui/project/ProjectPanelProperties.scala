@@ -22,4 +22,6 @@ class ProjectPanelProperties
 
   val autoRefreshDelayInSeconds = new IntProperty("auto_refresh_delay_in_seconds", 5)
 
+  val textSize = new IntProperty("text_size", 12)
+
 }

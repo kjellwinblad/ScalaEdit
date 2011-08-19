@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 package me.winsh.scalaedit.gui.console
 
+import java.awt.Font
 import scala.swing._
 import javax.swing.JToolBar
 import de.mud.terminal.vt320
@@ -44,7 +45,11 @@ class SBTConsolePanel extends VT320ConsoleBase {
 
   private class SBTProcess extends InOutSource {
 
-    private val properties = new SBTConsolePanelProperties()
+  	val properties = new SBTConsolePanelProperties()
+
+  	terminal.setFont(new Font(terminal.getFont().getName(),
+    	                        terminal.getFont().getStyle(),
+      	                      properties.textSize.get))
 
     val process = {
       //Check if SBT is in properties dir
@@ -82,7 +87,8 @@ class SBTConsolePanel extends VT320ConsoleBase {
           sbtStream.close()
 
         }
-
+				println(properties)
+				println(properties.echoInput)
         echoInput = properties.echoInput.get
 
         val args: java.util.List[String] =

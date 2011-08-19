@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 package me.winsh.scalaedit.gui.console
 
+import java.awt.Font
 import java.io.InputStream
 import java.io.OutputStream
 import scala.tools.nsc.interpreter.ILoop
@@ -49,9 +50,13 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 
   private class ScalaProcess extends InOutSource {
 
-    val process = {
+  	val properties = new StandAloneScalaConsolePanelProperties()
 
-      val properties = new StandAloneScalaConsolePanelProperties()
+  	terminal.setFont(new Font(terminal.getFont().getName(),
+    	                        terminal.getFont().getStyle(),
+      	                      properties.textSize.get))
+
+    val process = {
 
       try {
 
