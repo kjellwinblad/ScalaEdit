@@ -23,11 +23,11 @@ import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
-class SBTConsoleWithErrorList extends ConsolePanel {
+class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
 
   val consoleType = SBTConsole
 
-  private val sbtConsolePanel = new SBTConsolePanel()
+  private val sbtConsolePanel = new SBTConsolePanel(sbtVersion)
 
   private val errorList = new ListView[CodeNotification]() {
 

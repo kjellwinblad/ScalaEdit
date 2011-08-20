@@ -22,8 +22,8 @@ class ConsolesPanel extends TabbedPane {
     addTerminal("Scala Terminal", new StandAloneScalaConsolePanel(), "/images/small-icons/illustrations/scala-terminal.png")
   }
 
-  def addSBTTerminal() {
-    addTerminal("SBT Terminal", new SBTConsoleWithErrorList(), "/images/small-icons/illustrations/sbt-terminal.png")
+  def addSBTTerminal(version:String) {
+    addTerminal("SBT Terminal", new SBTConsoleWithErrorList(version), "/images/small-icons/illustrations/sbt-terminal.png")
   }
 
   def addTerminal(name: String, component: ConsolePanel, iconPath: String) {

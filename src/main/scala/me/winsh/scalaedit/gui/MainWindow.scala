@@ -41,7 +41,7 @@ import java.awt.event.HierarchyListener
 
 class MainWindow extends Frame {
 
-  val version = "0.2.6"
+  val version = "0.3.0"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -148,15 +148,26 @@ class MainWindow extends Frame {
 
       })
 
-      contents += new MenuItem(new Action("New SBT Terminal") {
+      contents += new Menu("SBT Terminal") {
 
-        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
+					icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
+					
+	      	contents +=  new MenuItem(new Action("Version 0.7.7") {
 
-        def apply() {
-          consolesPanel.addSBTTerminal()
-        }
+		        def apply() {
+		          consolesPanel.addSBTTerminal("0.7.7")
+		        }
+		        
+      		})
 
-      })
+	      	contents +=  new MenuItem(new Action("Version 0.10.1") {
+
+		        def apply() {
+		          consolesPanel.addSBTTerminal("0.10.1")
+		        }
+		        
+      		})
+      }
 
     }
 

@@ -39,7 +39,7 @@ import scala.collection.JavaConversions._
 import javax.swing.KeyStroke
 import java.awt.event.InputEvent
 
-class SBTConsolePanel extends VT320ConsoleBase {
+class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
 
   val consoleType = SBTConsole
 
@@ -54,7 +54,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
     val process = {
       //Check if SBT is in properties dir
 
-      val sbtJarName = "sbt-launch-0.7.7.jar"
+      val sbtJarName = "sbt-launch-" + sbtVersion + ".jar"
 
       try {
         val javaFile = new File(new File(System.getProperty("java.home"), "bin"), "java")
@@ -100,6 +100,7 @@ class SBTConsolePanel extends VT320ConsoleBase {
             (if (properties.arguments.get.size == 0) List[String]()
             else properties.arguments.get.split(" ").toList) ::: Nil
 
+				println(args.mkString(" "))
         val pb = new ProcessBuilder(args)
 
         pb.directory(properties.startingDir.get)
