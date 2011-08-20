@@ -169,11 +169,11 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
 
   private var toMatchOn = new StringBuffer()
 
-  private val beginning = """(?s)(.*Compiling.*sources.*)""".r
+  private val beginning = """(?s)(.*Compiling.*source.*)""".r
 
   private case object FirstErrorLine {
 
-    val regexpLine = """(?s).*error.*0m(.*):(\d*):(.*)\e.*""" //""".*\[.*e.*r.*r.*o.*r.*\]0m(.*):([^:]*):\s*(.*)\n"""
+    val regexpLine = """(?s)^(?!.*completed.*).*error.*0m(.*):(\d*):(.*)\e.*"""
 
     val le = regexpLine.r
 
@@ -190,7 +190,7 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
     }
   }
 
-  private val errorLine = """(?s).*error.*0m.*0m(.*)\e.*""".r
+  private val errorLine = """(?s)^(?!.*error.*found.*|.*Compilation.*failed.*|.*\s.*completed.*).*error.*0m.*0m(.*)\e.*""".r
 
   case object FirstWarningLine {
 
@@ -211,9 +211,9 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
     }
   }
 
-  private val warningLine = """(?s).*warn.*0m.*0m(.*)\e.*""".r
+  private val warningLine = """(?s)^(?!.*warning.*found.*).*warn.*0m.*0m(.*)\e.*""".r
 
-  val end = """(?s)(.*==\s*compile\s*==.*)""".r
+  val end = """(?s)(.*completed.*)""".r
 
   var codeNotifications: List[CodeNotification] = Nil
 
@@ -228,11 +228,11 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
           EditorsPanel().notifyAboutClearCodeInfo()
           toMatchOn = new StringBuffer()
         } case FirstErrorLine(fileName, lineNumber, message) => {
-
+          
           codeNotifications = Error(fileName, lineNumber, message) :: codeNotifications
 
           toMatchOn = new StringBuffer()
-        } case errorLine(messageExtention) if (!messageExtention.contains("error found")) => {
+        } case errorLine(messageExtention) => {
 
           try {
             val Error(fileName, lineNumber, message) :: rest = codeNotifications
@@ -245,7 +245,7 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
           codeNotifications = Warning(fileName, lineNumber, message) :: codeNotifications
 
           toMatchOn = new StringBuffer()
-        } case warningLine(messageExtention) if (!messageExtention.contains("warning found")) => {
+        } case warningLine(messageExtention) => {
 
           try {
             val Warning(fileName, lineNumber, message) :: rest = codeNotifications
