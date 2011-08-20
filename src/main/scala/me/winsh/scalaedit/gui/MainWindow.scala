@@ -41,7 +41,7 @@ import java.awt.event.HierarchyListener
 
 class MainWindow extends Frame {
 
-  val version = "0.3.0"
+  val version = "0.3.1"
 
   title = "ScalaEdit (" + version + ")"
 
