@@ -597,4 +597,6 @@ class EditorPanel(val fileBuffer: FileBuffer, val tabComponent: TabComponent) ex
     case _ => SyntaxConstants.SYNTAX_STYLE_NONE
   }
 
+  override def requestFocusInWindow() = editorPane.requestFocusInWindow()
+
 }

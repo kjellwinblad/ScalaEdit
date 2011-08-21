@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream
 //import com.wittams.gritty.RequestOrigin;
 //import com.wittams.gritty.ResizePanelDelegate;
 
-class SystemConsole extends ConsolePanel {
+abstract class SystemConsole extends ConsolePanel {
 
   def close() = { false }
 

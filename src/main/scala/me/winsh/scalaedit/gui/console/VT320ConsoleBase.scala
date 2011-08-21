@@ -10,7 +10,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 package me.winsh.scalaedit.gui.console
 
-
 import java.io.InputStream
 import java.io.OutputStream
 import de.mud.terminal.vt320
@@ -284,5 +283,9 @@ trait VT320ConsoleBase extends ConsolePanel {
 
   }
   disableArrowKeys(scrollPane.peer.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
+
+  def requestFocusForTerminal {
+    terminal.requestFocusInWindow()
+  }
 
 }

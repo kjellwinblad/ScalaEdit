@@ -38,6 +38,8 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.HierarchyEvent
 import java.awt.event.HierarchyListener
+import java.awt.EventQueue
+import java.awt.AWTEvent
 
 class MainWindow extends Frame {
 
@@ -150,23 +152,23 @@ class MainWindow extends Frame {
 
       contents += new Menu("SBT Terminal") {
 
-					icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
-					
-	      	contents +=  new MenuItem(new Action("Version 0.7.7") {
+        icon = Utils.getIcon("/images/small-icons/illustrations/sbt-terminal.png")
 
-		        def apply() {
-		          consolesPanel.addSBTTerminal("0.7.7")
-		        }
-		        
-      		})
+        contents += new MenuItem(new Action("Version 0.7.7") {
 
-	      	contents +=  new MenuItem(new Action("Version 0.10.1") {
+          def apply() {
+            consolesPanel.addSBTTerminal("0.7.7")
+          }
 
-		        def apply() {
-		          consolesPanel.addSBTTerminal("0.10.1")
-		        }
-		        
-      		})
+        })
+
+        contents += new MenuItem(new Action("Version 0.10.1") {
+
+          def apply() {
+            consolesPanel.addSBTTerminal("0.10.1")
+          }
+
+        })
       }
 
     }
@@ -338,5 +340,30 @@ class MainWindow extends Frame {
   SwingHelper.setDividerLocation(mainSplitPane, 0.72)
 
   SwingHelper.setDividerLocation(mainSplitPane.editorProjectSplitPane, 0.28)
+
+  //Listen to global shortcuts:
+  val ev = Toolkit.getDefaultToolkit().getSystemEventQueue()
+  ev.push(new EventQueue() {
+    override protected def dispatchEvent(event: AWTEvent) {
+      event match {
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F2) =>
+          projectPanel.requestFocusInWindow()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F3) =>
+          editorsPanel.requestFocusForTopComponent()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F4) =>
+          consolesPanel.requestFocusForTopComponent()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F5) =>
+          editorsPanel.requestFocusInWindow()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F6) =>
+          consolesPanel.requestFocusInWindow()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F7) =>
+          consolesPanel.requestFocusForToolComponent()
+        case key: KeyEvent if (key.getKeyCode() == KeyEvent.VK_F8) =>
+          consolesPanel.executeRunOnTopComponentIfPossible()
+        case _ => super.dispatchEvent(event)
+      }
+
+    }
+  })
 
 }

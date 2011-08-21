@@ -39,17 +39,17 @@ import scala.collection.JavaConversions._
 import javax.swing.KeyStroke
 import java.awt.event.InputEvent
 
-class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
+class SBTConsolePanel(sbtVersion: String = "0.7.7") extends VT320ConsoleBase {
 
   val consoleType = SBTConsole
 
   private class SBTProcess extends InOutSource {
 
-  	val properties = new SBTConsolePanelProperties()
+    val properties = new SBTConsolePanelProperties()
 
-  	terminal.setFont(new Font(terminal.getFont().getName(),
-    	                        terminal.getFont().getStyle(),
-      	                      properties.textSize.get))
+    terminal.setFont(new Font(terminal.getFont().getName(),
+      terminal.getFont().getStyle(),
+      properties.textSize.get))
 
     val process = {
       //Check if SBT is in properties dir
@@ -87,8 +87,7 @@ class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
           sbtStream.close()
 
         }
-				println(properties)
-				println(properties.echoInput)
+
         echoInput = properties.echoInput.get
 
         val args: java.util.List[String] =
@@ -100,7 +99,6 @@ class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
             (if (properties.arguments.get.size == 0) List[String]()
             else properties.arguments.get.split(" ").toList) ::: Nil
 
-				println(args.mkString(" "))
         val pb = new ProcessBuilder(args)
 
         pb.directory(properties.startingDir.get)
@@ -177,16 +175,20 @@ class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
     true
   }
 
+  def run() {
+    emulation.write("\n\nrun\n".map(_.toByte).toArray)
+  }
+
   object toolBar extends JToolBar {
 
     def add(a: Action) = super.add(a.peer)
 
     add(new Action("") {
       accelerator = Some(KeyStroke.getKeyStroke('R', InputEvent.CTRL_DOWN_MASK))
-      toolTip = "SBT Run Action"
+      toolTip = "<html>SBT Run Action (<i>F8, Use F7 to select the toolbar</i>)"
       icon = Utils.getIcon("/images/small-icons/play.png")
       def apply() {
-        emulation.write("\n\nrun\n".map(_.toByte).toArray)
+        run()
       }
     })
 
@@ -233,6 +235,9 @@ class SBTConsolePanel(sbtVersion:String="0.7.7") extends VT320ConsoleBase {
         emulation.write("\n\nhelp\n".map(_.toByte).toArray)
       }
     })
+
+    override def requestFocusInWindow() =
+      getComponentAtIndex(0).requestFocusInWindow()
 
   }
 

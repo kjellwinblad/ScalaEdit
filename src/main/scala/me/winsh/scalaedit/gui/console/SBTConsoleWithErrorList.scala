@@ -22,8 +22,10 @@ import java.io.File
 import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.JToolBar
+import java.lang.System
 
-class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
+class SBTConsoleWithErrorList(sbtVersion: String = "0.7.7") extends ConsolePanel {
 
   val consoleType = SBTConsole
 
@@ -228,7 +230,7 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
           EditorsPanel().notifyAboutClearCodeInfo()
           toMatchOn = new StringBuffer()
         } case FirstErrorLine(fileName, lineNumber, message) => {
-          
+
           codeNotifications = Error(fileName, lineNumber, message) :: codeNotifications
 
           toMatchOn = new StringBuffer()
@@ -268,5 +270,17 @@ class SBTConsoleWithErrorList(sbtVersion:String="0.7.7") extends ConsolePanel {
 
     }
   })
+
+  def toolBar: JToolBar = sbtConsolePanel.toolBar
+
+  def requestFocusForTerminal {
+    sbtConsolePanel.requestFocusForTerminal
+  }
+  private var lastRun: Long = 0
+  def run() {
+    if (System.currentTimeMillis() - lastRun > 500)
+      sbtConsolePanel.run()
+    lastRun = System.currentTimeMillis()
+  }
 
 }

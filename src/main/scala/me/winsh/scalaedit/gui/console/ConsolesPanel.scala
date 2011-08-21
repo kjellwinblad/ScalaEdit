@@ -22,7 +22,7 @@ class ConsolesPanel extends TabbedPane {
     addTerminal("Scala Terminal", new StandAloneScalaConsolePanel(), "/images/small-icons/illustrations/scala-terminal.png")
   }
 
-  def addSBTTerminal(version:String) {
+  def addSBTTerminal(version: String) {
     addTerminal("SBT Terminal", new SBTConsoleWithErrorList(version), "/images/small-icons/illustrations/sbt-terminal.png")
   }
 
@@ -40,6 +40,37 @@ class ConsolesPanel extends TabbedPane {
     pages.foreach((page) => {
       page.content.asInstanceOf[Closeable].close()
     })
+  }
+
+  def currentConsolePanel = pages.find(_.content.peer == peer.getSelectedComponent()) match {
+    case Some(page) if (page.content.isInstanceOf[ConsolePanel]) =>
+      Some(page.content.asInstanceOf[ConsolePanel])
+    case _ => None
+  }
+
+  def requestFocusForTopComponent() = currentConsolePanel match {
+    case None => requestFocusInWindow()
+    case Some(panel) => panel.requestFocusForTerminal
+  }
+
+  def requestFocusForToolComponent() {
+    currentConsolePanel match {
+      case None => ; //Do nothing
+      case Some(panel) =>
+        try {
+          panel.asInstanceOf[SBTConsoleWithErrorList].toolBar.requestFocusInWindow()
+        } catch { case _ => ; /*Do nothing*/ }
+    }
+  }
+
+  def executeRunOnTopComponentIfPossible() {
+    currentConsolePanel match {
+      case None => ; //Do nothing
+      case Some(panel) =>
+        try {
+          panel.asInstanceOf[SBTConsoleWithErrorList].run()
+        } catch { case _ => ; /*Do nothing*/ }
+    }
   }
 
 }

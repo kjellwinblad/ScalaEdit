@@ -43,8 +43,8 @@ The value of the arguments propery will be sent to the process. It is optional.
   val arguments = new StringProperty("arguments")
 
   val echoInput = {
-  	val isWindows = System.getProperty("os.name").toLowerCase.contains("windows")
-  	new BooleanProperty("echo_input",isWindows)
+    val isWindows = System.getProperty("os.name").toLowerCase.contains("windows")
+    new BooleanProperty("echo_input", isWindows)
   }
 
   val textSize = new IntProperty("text_size", 12)

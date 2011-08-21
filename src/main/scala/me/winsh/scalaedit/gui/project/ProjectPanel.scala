@@ -31,17 +31,15 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
   var tree = new ProjectTree(Utils.projectDir)
 
-
   val scrollPane = new ScrollPane(tree)
 
   add(scrollPane, BorderPanel.Position.Center)
 
   class ProjectTree(projectRoot: File) extends Tree[File] {
 
-
-	  peer.setFont(new Font(peer.getFont().getName(),
-    	                    peer.getFont().getStyle(),
-      	                  properties.textSize.get))
+    peer.setFont(new Font(peer.getFont().getName(),
+      peer.getFont().getStyle(),
+      properties.textSize.get))
 
     val root = projectRoot.getCanonicalFile
 
@@ -368,4 +366,6 @@ class ProjectPanel(val fileSelectionHandler: (File) => Unit) extends BorderPanel
 
     tree.peer.setSelectionPath(path)
   }
+
+  override def requestFocusInWindow() = tree.requestFocusInWindow()
 }

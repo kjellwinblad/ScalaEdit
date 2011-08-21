@@ -24,8 +24,8 @@ import me.winsh.scalaedit.api.SCompletionProvider._
 
 abstract class EditorsPanel extends TabbedPane {
 
-val providerJava = createCompeletionProvider(keywordJava)
-val providerScala=createCompeletionProvider(keywordScala)
+  val providerJava = createCompeletionProvider(keywordJava)
+  val providerScala = createCompeletionProvider(keywordScala)
 
   val projectPanel: Option[ProjectPanel] = None
 
@@ -85,13 +85,13 @@ val providerScala=createCompeletionProvider(keywordScala)
 
       peer.setSelectedComponent(newEditorPanel.peer)
 
-			buffer.contentType.toLowerCase match {
-	
-				case "text/java" => new AutoCompletion(providerJava).install(newEditorPanel.editorPane)
-				case "text/scala" => new AutoCompletion(providerScala).install(newEditorPanel.editorPane)
-			  case _      =>
-			}
-  
+      buffer.contentType.toLowerCase match {
+
+        case "text/java" => new AutoCompletion(providerJava).install(newEditorPanel.editorPane)
+        case "text/scala" => new AutoCompletion(providerScala).install(newEditorPanel.editorPane)
+        case _ =>
+      }
+
       newEditorPanel
 
     }
@@ -199,6 +199,11 @@ val providerScala=createCompeletionProvider(keywordScala)
   def notifyAboutClearCodeInfo() {
     for (e <- bufferToEditorMap.values)
       e.notifyAboutClearCodeInfo()
+  }
+
+  def requestFocusForTopComponent() = currentEditorPanel match {
+    case None => requestFocusInWindow()
+    case Some(panel) => panel.requestFocusInWindow()
   }
 
 }

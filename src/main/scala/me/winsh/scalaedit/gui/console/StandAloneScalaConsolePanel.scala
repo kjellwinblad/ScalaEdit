@@ -50,11 +50,11 @@ class StandAloneScalaConsolePanel extends VT320ConsoleBase {
 
   private class ScalaProcess extends InOutSource {
 
-  	val properties = new StandAloneScalaConsolePanelProperties()
+    val properties = new StandAloneScalaConsolePanelProperties()
 
-  	terminal.setFont(new Font(terminal.getFont().getName(),
-    	                        terminal.getFont().getStyle(),
-      	                      properties.textSize.get))
+    terminal.setFont(new Font(terminal.getFont().getName(),
+      terminal.getFont().getStyle(),
+      properties.textSize.get))
 
     val process = {
 
