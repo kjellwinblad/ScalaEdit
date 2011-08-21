@@ -12,7 +12,7 @@ Executable binaries can be downloaded from the project web site:
 Compile and Run
 ---------------
 
-Requirements: [sbt](http://code.google.com/p/simple-build-tool/), Java SDK 1.6 and git
+Requirements: [sbt 0.7.7](http://code.google.com/p/simple-build-tool/), Java SDK 1.6 and git
 
 In a system console:
 
