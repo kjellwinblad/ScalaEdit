@@ -43,7 +43,7 @@ import java.awt.AWTEvent
 
 class MainWindow extends Frame {
 
-  val version = "0.3.1"
+  val version = "0.3.2"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -225,7 +225,7 @@ class MainWindow extends Frame {
 
       mnemonic = Key.H
 
-      contents += new MenuItem(Action("About") {
+      contents += new MenuItem(Action("About...") {
 
         val text =
           <html>
@@ -274,6 +274,42 @@ class MainWindow extends Frame {
 
       contents += new Separator()
 
+      contents += new MenuItem(Action("Global Shortcuts...") {
+
+        val text =
+          <html>
+            <h1>Global Shortcuts</h1>
+            <p>The following global shortcuts can be used in the application:</p>
+            <p>
+              <table>
+                <tr><td><i><b>Key</b></i></td><td><i><b>Function</b></i></td></tr>
+                <tr><td><b>F1</b></td><td>is reserved for future use.</td></tr>
+                <tr><td><b>F2</b></td><td>selects the project browser so folders can be opened with the<br/>keyboard.</td></tr>
+                <tr><td><b>F3</b></td><td>selects the currently selected text editor so text can be entered.</td></tr>
+                <tr><td><b>F4</b></td><td>selects the currently selected terminal so commands can be typed.</td></tr>
+                <tr><td><b>F5</b></td><td>selects the editor tab panel so the editor can be changed with<br/>the arrow keys.</td></tr>
+                <tr><td><b>F6</b></td><td>selects the terminal tab panel so the terminal can be changed<br/>with the arrow keys.</td></tr>
+                <tr><td><b>F7</b></td><td>
+                                        selects the tools panel in the currently opened SBT terminal.<br/>
+                                        This only works if an SBT panel is opened and selected.
+                                      </td></tr>
+                <tr><td><b>F8</b></td><td>
+                                        executes the SBT run command in the currently opened SBT terminal.<br/>
+                                        This only works if an SBT panel is opened and selected.
+                                      </td></tr>
+              </table>
+            </p>
+          </html>.toString.split("\n").foldLeft("")((a, b) => a + b)
+
+        val options = Array[Object]("OK");
+        JOptionPane.showOptionDialog(null, text, "ScalaEdit Global Shortcuts",
+          JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+          null, options, options(0))
+
+      })
+
+      contents += new Separator()
+
       val desktop = Desktop.getDesktop
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>Scala API</u></font>""") {
@@ -284,8 +320,12 @@ class MainWindow extends Frame {
         desktop.browse(new URI("http://download.oracle.com/javase/6/docs/api/"))
       })
 
-      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt documentation</u></font>""") {
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt 0.7.7 documentation</u></font>""") {
         desktop.browse(new URI("http://code.google.com/p/simple-build-tool/"))
+      })
+
+      contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt 0.10.1 documentation</u></font>""") {
+        desktop.browse(new URI("http://github.com/harrah/xsbt/wiki"))
       })
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>ScalaEdit Web Site</u></font>""") {
