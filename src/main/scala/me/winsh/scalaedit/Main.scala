@@ -17,7 +17,6 @@ import scala.swing._
 import java.awt.Toolkit
 import javax.swing.UIManager
 import java.awt.Point
-import java.awt.SplashScreen
 import java.awt.event._
 import java.io.File
 
@@ -26,16 +25,8 @@ object Main {
   //Initialize properties dir
   Utils.propertiesDir.mkdir()
 
-  private val splash = SplashScreen.getSplashScreen()
-  if (splash != null) {
-    splash.setImageURL(this.getClass.getResource("/images/img3.png"))
-    splash.update()
-  }
 
   def main(args: Array[String]) = {
-
-    if (splash != null)
-      splash.close()
 
     SwingHelper.invokeLater(() => {
 
@@ -44,7 +35,7 @@ object Main {
           if (shutDownOpenResources()) {
             visible = false
             dispose()
-            Thread.sleep(800)
+            Thread.sleep(1200)
             sys.exit()
           }
         })

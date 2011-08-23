@@ -24,8 +24,6 @@ import javax.swing.JOptionPane
 import me.winsh.scalaedit.gui.editor._
 import me.winsh.scalaedit.gui.project._
 import me.winsh.scalaedit.gui.console._
-import java.awt.Desktop
-import java.net.URI
 import scala.swing.event._
 import scala.io.Source
 import javax.swing.event.MenuListener
@@ -43,7 +41,7 @@ import java.awt.AWTEvent
 
 class MainWindow extends Frame {
 
-  val version = "0.3.2"
+  val version = "0.3.3"
 
   title = "ScalaEdit (" + version + ")"
 
@@ -310,26 +308,24 @@ class MainWindow extends Frame {
 
       contents += new Separator()
 
-      val desktop = Desktop.getDesktop
-
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>Scala API</u></font>""") {
-        desktop.browse(new URI("http://www.scala-lang.org/api/current/index.html"))
+        Utils.openURLInBrowser("http://www.scala-lang.org/api/current/index.html")
       })
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>Java API</u></font>""") {
-        desktop.browse(new URI("http://download.oracle.com/javase/6/docs/api/"))
+        Utils.openURLInBrowser("http://download.oracle.com/javase/6/docs/api/")
       })
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt 0.7.7 documentation</u></font>""") {
-        desktop.browse(new URI("http://code.google.com/p/simple-build-tool/"))
+        Utils.openURLInBrowser("http://code.google.com/p/simple-build-tool/")
       })
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>sbt 0.10.1 documentation</u></font>""") {
-        desktop.browse(new URI("http://github.com/harrah/xsbt/wiki"))
+        Utils.openURLInBrowser("http://github.com/harrah/xsbt/wiki")
       })
 
       contents += new MenuItem(Action("""<html><font color="BLUE"><u>ScalaEdit Web Site</u></font>""") {
-        desktop.browse(new URI("http://code.google.com/p/scala-edit/"))
+        Utils.openURLInBrowser("http://code.google.com/p/scala-edit/")
       })
 
     }

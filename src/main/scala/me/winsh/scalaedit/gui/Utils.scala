@@ -14,6 +14,9 @@ import me.winsh.scalaedit.api._
 import javax.swing._
 import java.io.File
 import scala.swing._
+import java.awt.Desktop
+import java.net.URI
+import edu.stanford.ejalbert.BrowserLauncher
 
 object Utils {
 
@@ -85,5 +88,20 @@ object Utils {
       title = "Error",
       messageType = Dialog.Message.Error)
   }
+
+     def openURLInBrowser(url:String){
+      	//First try to open it with the Desktop API
+      	//Might not be supported on all platforms
+      	try{
+      		val desktop = Desktop.getDesktop
+      		desktop.browse(new URI(url))
+      	}catch{
+      		case _ =>{
+      			//Open with the BrowserLauncher2 library
+      			val launcher = new BrowserLauncher()
+      			launcher.openURLinBrowser(url)
+      		}
+      	}
+      }
 
 }
