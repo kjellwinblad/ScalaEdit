@@ -25,7 +25,6 @@ object Main {
   //Initialize properties dir
   Utils.propertiesDir.mkdir()
 
-
   def main(args: Array[String]) = {
 
     SwingHelper.invokeLater(() => {
