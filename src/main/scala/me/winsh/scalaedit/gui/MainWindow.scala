@@ -167,6 +167,15 @@ class MainWindow extends Frame {
           }
 
         })
+
+        contents += new MenuItem(new Action("Version 0.11") {
+
+          def apply() {
+            consolesPanel.addSBTTerminal("0.11")
+          }
+
+        })
+      
       }
 
     }
