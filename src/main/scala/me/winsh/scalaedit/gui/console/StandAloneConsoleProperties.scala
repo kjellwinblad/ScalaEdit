@@ -48,4 +48,6 @@ The value of the arguments propery will be sent to the process. It is optional.
   }
 
   val textSize = new IntProperty("text_size", 12)
+  val maxNumberOfLines = new IntProperty("max_number_of_lines", 200)
+  val maxWidth = new IntProperty("max_width", 80)
 }

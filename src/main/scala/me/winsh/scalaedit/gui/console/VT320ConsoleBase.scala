@@ -29,7 +29,7 @@ import java.awt.event.InputEvent
 import java.awt.event.FocusListener
 import java.awt.event.FocusEvent
 
-trait VT320ConsoleBase extends ConsolePanel {
+abstract class VT320ConsoleBase(private val properties:StandAloneConsoleProperties) extends ConsolePanel {
 
   var echoInput = false
 
@@ -46,9 +46,10 @@ trait VT320ConsoleBase extends ConsolePanel {
 
   def inOutSource: InOutSource
 
-  private val linesInEmulator = 100
+  private val linesInEmulator = properties.maxNumberOfLines.get
 
-  val emulation: vt320 = new vt320(80, linesInEmulator) {
+  val emulation: vt320 = new vt320(properties.maxWidth.get, linesInEmulator) {
+  	setBufferSize(linesInEmulator)
     def write(b: Array[Byte]) {
       if (echoInput) {
         //Replace the byte 10 or 13 with 10,13

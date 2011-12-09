@@ -19,11 +19,22 @@ import javax.swing.UIManager
 import java.awt.Point
 import java.awt.event._
 import java.io.File
+import java.io.FileInputStream
+import scala.actors.Actor._
 
 object Main {
 
   //Initialize properties dir
-  Utils.propertiesDir.mkdir()
+  val propDir = Utils.propertiesDir
+  propDir.mkdir()
+  //Let the operating system buffer properties files in the background
+  actor{
+    propDir.listFiles().filter((f)=>f.isFile &&f.getName.endsWith(".properties")).foreach((file)=>{
+      val is = new FileInputStream(file)
+      while(is.read() != -1)None;
+      is.close()
+    })
+  }
 
   def main(args: Array[String]) = {
 

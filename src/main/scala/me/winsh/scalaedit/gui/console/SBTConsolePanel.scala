@@ -39,13 +39,17 @@ import scala.collection.JavaConversions._
 import javax.swing.KeyStroke
 import java.awt.event.InputEvent
 
-class SBTConsolePanel(sbtVersion: String = "0.7.7") extends VT320ConsoleBase {
+class SBTConsolePanel(sbtVersion: String, 
+                      private val properties:SBTConsolePanelProperties) 
+                        extends VT320ConsoleBase(properties) {
+
+	def this(sbtVersion: String = "0.7.7"){
+		this(sbtVersion, new SBTConsolePanelProperties())
+	}
 
   val consoleType = SBTConsole
 
   private class SBTProcess extends InOutSource {
-
-    val properties = new SBTConsolePanelProperties()
 
     terminal.setFont(new Font(terminal.getFont().getName(),
       terminal.getFont().getStyle(),

@@ -45,7 +45,12 @@ import scala.util.matching.Regex
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
-class StandAloneScalaConsolePanel extends VT320ConsoleBase {
+class StandAloneScalaConsolePanel(private val properties:StandAloneScalaConsolePanelProperties) 
+                        extends VT320ConsoleBase(properties) {
+
+	def this(){
+		this(new StandAloneScalaConsolePanelProperties())
+	}
   val consoleType = StandAloneScalaConsole
 
   private class ScalaProcess extends InOutSource {
