@@ -78,9 +78,9 @@ class StandAloneScalaConsolePanel(private val properties:StandAloneScalaConsoleP
 
         val classPath = (standardClassPath +
           (if (properties.javaClasspath.get.trim == "") "" else ":" + propCPStringToCPString(properties.javaClasspath.get)))
-
+        
         echoInput = properties.echoInput.get
-
+        
         val args: java.util.List[String] =
           javaPath ::
             properties.javaVMArguments.get.split("""\s""").toList.filter(_.size > 0) :::
@@ -93,8 +93,6 @@ class StandAloneScalaConsolePanel(private val properties:StandAloneScalaConsoleP
 
         val pb =
           new ProcessBuilder(args)
-
-        pb.directory(Utils.projectDir)
 
         pb.start()
 

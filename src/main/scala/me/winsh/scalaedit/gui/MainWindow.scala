@@ -41,7 +41,7 @@ import java.awt.AWTEvent
 
 class MainWindow extends Frame {
 
-  val version = "0.3.5"
+  val version = "0.3.7"
 
   title = "ScalaEdit (" + version + ")"
 
